@@ -13,6 +13,8 @@ class OppgaveRepository(
     private val jdbcTemplate: NamedParameterJdbcTemplate,
 ) {
 
+
+
     fun hentAlleOppgaver(): List<Oppgave> {
         return jdbcTemplate.query(
             "SELECT * FROM OPPGAVE",
@@ -59,6 +61,20 @@ class OppgaveRepository(
             ),
             DataClassRowMapper(Int::class.java)
         )
+    }
+
+    fun hentOppgave(oppgaveId: Int): Oppgave {
+        return jdbcTemplate.queryForObject(
+            """SELECT * FROM OPPGAVE
+                |WHERE ID = :id
+            """.trimMargin(),
+            MapSqlParameterSource(
+                mapOf(
+                    "id" to oppgaveId,
+                )
+            ),
+            DataClassRowMapper(Oppgave::class.java)
+        )!!
     }
 
 }

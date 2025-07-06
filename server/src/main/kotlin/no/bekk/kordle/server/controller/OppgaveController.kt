@@ -1,5 +1,6 @@
 package no.bekk.kordle.server.controller
 
+import no.bekk.kordle.server.dto.GjettOrdRequest
 import no.bekk.kordle.server.dto.LeggTilOrdRequest
 import no.bekk.kordle.server.dto.Oppgave
 import no.bekk.kordle.server.exceptions.OrdetEksistererAlleredeIDatabasenException
@@ -44,6 +45,12 @@ class OppgaveController(
                 .status(statusKodeSomSkalReturneres)
                 .body(exception.message)
         }
+    }
+
+    @PostMapping("/gjettOrd")
+    fun gjettOrd(@RequestBody gjettOrdRequest: GjettOrdRequest): ResponseEntity<*> {
+        val bokstavTreff = oppgaveService.gjettOrd(gjettOrdRequest)
+        return ResponseEntity.ok().body(bokstavTreff)
     }
 }
 

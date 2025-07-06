@@ -1,5 +1,7 @@
 package no.bekk.kordle.server.service
 
+import no.bekk.kordle.server.dto.BokstavTreff
+import no.bekk.kordle.server.dto.GjettOrdRequest
 import no.bekk.kordle.server.dto.Oppgave
 import no.bekk.kordle.server.exceptions.OrdetEksistererAlleredeIDatabasenException
 import no.bekk.kordle.server.exceptions.OrdetHarUgyldigLengdeException
@@ -44,5 +46,30 @@ class OppgaveService(
             ord = ordSomSkalLeggesTil,
             lengde = ordSomSkalLeggesTil.length
         )
+    }
+
+    // TODO: Vurder om sjekken for eksisterende ord bør gjøres i databasen istedenfor. Kanskje en oppgave i seg selv?
+    fun gjettOrd(gjettOrdRequest: GjettOrdRequest): List<BokstavTreff> {
+        val oppgaveGjettetPaa = oppgaveRepository.hentOppgave(gjettOrdRequest.oppgaveId)
+        val bokstavTreff = sjekkBokstavTreff(
+            oppgave = oppgaveGjettetPaa,
+            ordGjettet = gjettOrdRequest.ordGjett
+        )
+        return bokstavTreff
+    }
+
+    fun sjekkBokstavTreff(
+        oppgave: Oppgave,
+        ordGjettet: String
+    ): List<BokstavTreff> {
+        val ordIOppgave = oppgave.ord
+        return ordGjettet.mapIndexed { index, bokstav ->
+            BokstavTreff(
+                plassISekvensen = index,
+                bokstavGjettet = bokstav.toString(),
+                erBokstavenIOrdet = ordIOppgave.contains(bokstav),
+                erBokstavenPaaRettsted = ordIOppgave[index] == bokstav
+            )
+        }.sortedBy { it.plassISekvensen }
     }
 }

@@ -45,7 +45,7 @@ class FirstScreen : KtxScreen {
                 table.button {
                     label("[ENT]")
                     onClick {
-                        println("Entered value $value")
+                        println("Entered value $value")s
                     }
                 }
             }
@@ -77,7 +77,7 @@ class FirstScreen : KtxScreen {
     }
 
     private fun addLetter(letter: Char) {
-        if (value.length >= 5) return // Limit to 5 characters
+        if (value.length >= 6) return // Limit to 5 characters
         value += letter
         valueLabel.setText(value.uppercase())
     }
