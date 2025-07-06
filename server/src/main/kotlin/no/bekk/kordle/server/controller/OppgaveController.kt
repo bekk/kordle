@@ -1,5 +1,6 @@
 package no.bekk.kordle.server.controller
 
+import no.bekk.kordle.server.repository.Ord
 import no.bekk.kordle.server.service.OppgaveService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
@@ -12,5 +13,10 @@ class OppgaveController(
     @GetMapping("/hello")
     fun helloWorld(): String {
         return "HELLO WORLD FROM OPPGAVE CONTROLLER"
+    }
+
+    @GetMapping("/ord/hentTilfeldigOrd")
+    fun hentAlleOrd(): Ord {
+        return oppgaveService.hentTilfeldigOrd()
     }
 }

@@ -1,0 +1,6 @@
+// @no-log
+GET localhost:8080/ord/hentTilfeldigOrd
+
+> {%
+    client.log(response.body)
+%}
