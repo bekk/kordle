@@ -1,5 +1,7 @@
 package no.bekk.kordle.server.dto
 
+import org.springframework.stereotype.Service
+
 
 data class Oppgave(
     val id: Int,
@@ -16,7 +18,7 @@ data class GjettOrdRequest(
     val ordGjett: String
 )
 
-@Se
+
 data class GjettResponse(
     val oppgaveId: Int,
     val alleBokstavtreff: List<BokstavTreff>
