@@ -45,7 +45,7 @@ class FirstScreen : KtxScreen {
                 table.button {
                     label("[ENT]")
                     onClick {
-                        println("Entered value $value")s
+                        println("Entered value $value")
                     }
                 }
             }
