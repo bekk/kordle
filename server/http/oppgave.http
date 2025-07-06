@@ -1,0 +1,10 @@
+### Hent en tilfeldig oppgave fra backenden
+GET localhost:8080/hentTilfeldigOppgave
+
+### Legg til et ord i databasen
+POST localhost:8080/leggTilOrd
+Content-Type: application/json
+
+{
+  "ord": "morsom"
+}

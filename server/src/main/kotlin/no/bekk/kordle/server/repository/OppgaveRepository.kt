@@ -1,49 +1,60 @@
 package no.bekk.kordle.server.repository
 
-import no.bekk.kordle.server.dto.Ord
+import no.bekk.kordle.server.dto.Oppgave
 import org.springframework.jdbc.core.DataClassRowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.stereotype.Repository
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import org.springframework.jdbc.support.GeneratedKeyHolder
+import org.springframework.jdbc.support.KeyHolder
 
 @Repository
 class OppgaveRepository(
     private val jdbcTemplate: NamedParameterJdbcTemplate,
 ) {
 
-    fun hentAlleOrd(): List<Ord> {
+    fun hentAlleOppgaver(): List<Oppgave> {
         return jdbcTemplate.query(
-            "SELECT * FROM ORD",
-            DataClassRowMapper(Ord::class.java),
+            "SELECT * FROM OPPGAVE",
+            DataClassRowMapper(Oppgave::class.java),
         )
     }
 
-    fun leggTilOrd(ord: Ord): Int {
-        return jdbcTemplate.update(
-            """INSERT INTO ORD (tekst, lengde)
-                |VALUES (:tekst, :lengde)
+    /**
+     * Legger til et ord som en oppgave i databasen og returnerer ID-en til den nye oppgaven som blir laget.
+     * @param ord Ordet til oppgaven som skal legges til.
+     * @param lengde Lengden på ordet til oppgaven som skal legges til.
+     * @return ID-en til den nye oppgaven som ble lagt til i databasen.
+     */
+    fun leggTilOppgave(ord: String, lengde: Int): Int {
+        val keyHolder: KeyHolder = GeneratedKeyHolder()
+        jdbcTemplate.update(
+            """INSERT INTO OPPGAVE (ord, lengde)
+                |VALUES (:ord, :lengde)
             """.trimMargin(),
             MapSqlParameterSource(
                 mapOf(
-                    "tekst" to ord.tekst,
-                    "lengde" to ord.lengde,
+                    "ord" to ord,
+                    "lengde" to lengde,
                 )
-            )
+            ),
+            keyHolder
         )
+        return (keyHolder.key as Long).toInt()
     }
 
-    fun eksistererOrdIDatabasen(tekst:String): Int? {
+    fun eksistererOrdIDatabasen(ord:String): Int? {
         return jdbcTemplate.queryForObject(
             """SELECT CASE WHEN
-                |EXISTS(SELECT tekst FROM ORD WHERE tekst=:tekst)
+                |EXISTS(SELECT ord FROM OPPGAVE WHERE ord=:ord)
                 |THEN 1
                 |ELSE 0
-                |END AS tekstEksisterer
+                |END AS ordEksisterer
                 |FROM dual;
             """.trimMargin(),
             MapSqlParameterSource(
                 mapOf(
-                    "tekst" to tekst,
+                    "ord" to ord,
                 )
             ),
             DataClassRowMapper(Int::class.java)

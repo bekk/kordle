@@ -1,7 +1,7 @@
 package no.bekk.kordle.server.controller
 
 import no.bekk.kordle.server.dto.LeggTilOrdRequest
-import no.bekk.kordle.server.dto.Ord
+import no.bekk.kordle.server.dto.Oppgave
 import no.bekk.kordle.server.exceptions.OrdetEksistererAlleredeIDatabasenException
 import no.bekk.kordle.server.exceptions.OrdetHarUgyldigLengdeException
 import no.bekk.kordle.server.service.OppgaveService
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class OrdController(
+class OppgaveController(
     private val oppgaveService: OppgaveService,
 ) {
 
@@ -22,19 +22,19 @@ class OrdController(
         return "HELLO WORLD FROM OPPGAVE CONTROLLER"
     }
 
-    @GetMapping("/ord/hentTilfeldigOrd")
-    fun hentAlleOrd(): Ord {
-        return oppgaveService.hentTilfeldigOrd()
+    @GetMapping("/hentTilfeldigOppgave")
+    fun hentTilfeldigOppgave(): Oppgave {
+        return oppgaveService.hentTilfeldigOppgave()
     }
 
-    @PostMapping("/ord/leggTilOrd")
+    @PostMapping("/leggTilOrd")
     fun leggTilOrd(@RequestBody leggTilOrdRequest: LeggTilOrdRequest): ResponseEntity<*> {
         try {
-            val tekstFraRequest = leggTilOrdRequest.tekstSomSkalLeggesTil
-            val ordSomBleLagtTil = oppgaveService.leggTilOrd(tekstFraRequest)
-            return ResponseEntity.ok().body<Ord>(ordSomBleLagtTil)
+            val ordSomSkalLeggesTil = leggTilOrdRequest.ord
+            val ordSomBleLagtTil = oppgaveService.leggTilOrd(ordSomSkalLeggesTil)
+            return ResponseEntity.ok().body(ordSomBleLagtTil)
 
-        } catch (exception: Exception) {
+        } catch (exception: RuntimeException) {
             val statusKodeSomSkalReturneres = when (exception) {
                 is OrdetEksistererAlleredeIDatabasenException -> HttpStatus.CONFLICT
                 is OrdetHarUgyldigLengdeException -> HttpStatus.BAD_REQUEST

@@ -1,6 +1,6 @@
 package no.bekk.kordle.server.service
 
-import no.bekk.kordle.server.dto.Ord
+import no.bekk.kordle.server.dto.Oppgave
 import no.bekk.kordle.server.exceptions.OrdetEksistererAlleredeIDatabasenException
 import no.bekk.kordle.server.exceptions.OrdetHarUgyldigLengdeException
 import no.bekk.kordle.server.repository.OppgaveRepository
@@ -11,36 +11,38 @@ class OppgaveService(
     val oppgaveRepository: OppgaveRepository
 ) {
 
-    fun hentTilfeldigOrd(): Ord {
-        val alleOrd = oppgaveRepository.hentAlleOrd()
-        return alleOrd.random()
+    fun hentTilfeldigOppgave(): Oppgave {
+        val alleOppgaver = oppgaveRepository.hentAlleOppgaver()
+        return alleOppgaver.random()
     }
 
     // TODO: Vurder om sjekken for eksisterende ord bør gjøres i databasen istedenfor. Kanskje en oppgave i seg selv?
-    fun leggTilOrd(ordSomSkalLeggesTil:String): Ord {
+    fun leggTilOrd(ordSomSkalLeggesTil:String): Oppgave {
         val erOrdetGyldigLengde = ordSomSkalLeggesTil.length in 4..6
         if (!erOrdetGyldigLengde) {
             throw OrdetHarUgyldigLengdeException("Ordet '$ordSomSkalLeggesTil' må ha en lengde mellom 4 og 6 tegn.")
         }
 
         val eksistererOrdetAlleredeIDatabasen = oppgaveRepository
-            .hentAlleOrd()
-            // 'Any' spør om det finnes MINST ett ord i listen som matcher betingelsen. I dette tilfellet om det finnes et ord med samme tekst som det nye ordet.
-            .any { ordIdatabasen ->
-                val tekstTilOrdIdatabasen = ordIdatabasen.tekst
-                return@any tekstTilOrdIdatabasen == ordSomSkalLeggesTil
+            .hentAlleOppgaver()
+            // 'Any' spør om det finnes MINST ett ord i listen som matcher betingelsen. I dette tilfellet om det finnes en oppgave med samme ord som det nye ordet en prøver å legge til.
+            .any { oppgaveIDatabasen ->
+                val ordTiloppgave = oppgaveIDatabasen.ord
+                return@any ordTiloppgave == ordSomSkalLeggesTil
             }
 
         if (eksistererOrdetAlleredeIDatabasen) {
             throw OrdetEksistererAlleredeIDatabasenException("Ordet '$ordSomSkalLeggesTil' finnes allerede i databasen.")
         }
 
-        val tekstLengde = ordSomSkalLeggesTil.length
-        val nyttOrd = Ord(
-            tekst = ordSomSkalLeggesTil,
-            lengde = tekstLengde
+        val idTilNyopprettetOppgave = oppgaveRepository.leggTilOppgave(
+            ord = ordSomSkalLeggesTil,
+            lengde = ordSomSkalLeggesTil.length
         )
-        oppgaveRepository.leggTilOrd(nyttOrd)
-        return nyttOrd
+        return Oppgave(
+            id = idTilNyopprettetOppgave,
+            ord = ordSomSkalLeggesTil,
+            lengde = ordSomSkalLeggesTil.length
+        )
     }
 }

@@ -1,11 +1,12 @@
 package no.bekk.kordle.server.dto
 
 
-data class Ord(
-    val tekst: String,
+data class Oppgave(
+    val id: Int,
+    val ord: String,
     val lengde: Int,
 )
 
 data class LeggTilOrdRequest(
-    val tekstSomSkalLeggesTil: String
+    val ord: String
 )
