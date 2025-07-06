@@ -16,6 +16,7 @@ data class GjettOrdRequest(
     val ordGjett: String
 )
 
+@Se
 data class GjettResponse(
     val oppgaveId: Int,
     val alleBokstavtreff: List<BokstavTreff>
