@@ -1,6 +1,10 @@
-// @no-log
+### Hent et tilfeldig ord fra backenden
 GET localhost:8080/ord/hentTilfeldigOrd
 
-> {%
-    client.log(response.body)
-%}
+### Legg til et ord i databasen
+POST localhost:8080/ord/leggTilOrd
+Content-Type: application/json
+
+{
+  "ord": "morsom"
+}
