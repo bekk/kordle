@@ -1,7 +1,4 @@
-package no.bekk.kordle.server.dto
-
-import org.springframework.stereotype.Service
-
+package no.bekk.kordle.shared.dto
 
 data class Oppgave(
     val id: Int,

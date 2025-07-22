@@ -1,11 +1,11 @@
 package no.bekk.kordle.server.controller
 
-import no.bekk.kordle.server.dto.GjettOrdRequest
-import no.bekk.kordle.server.dto.LeggTilOrdRequest
-import no.bekk.kordle.server.dto.Oppgave
 import no.bekk.kordle.server.exceptions.OrdetEksistererAlleredeIDatabasenException
 import no.bekk.kordle.server.exceptions.OrdetHarUgyldigLengdeException
 import no.bekk.kordle.server.service.OppgaveService
+import no.bekk.kordle.shared.dto.GjettOrdRequest
+import no.bekk.kordle.shared.dto.LeggTilOrdRequest
+import no.bekk.kordle.shared.dto.Oppgave
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -33,7 +33,7 @@ class OppgaveController(
         try {
             val ordSomSkalLeggesTil = leggTilOrdRequest.ord
             val ordSomBleLagtTil = oppgaveService.leggTilOrd(ordSomSkalLeggesTil)
-            return ResponseEntity.ok().body(ordSomBleLagtTil)
+            return ResponseEntity.ok().body<Oppgave>(ordSomBleLagtTil)
 
         } catch (exception: RuntimeException) {
             val statusKodeSomSkalReturneres = when (exception) {

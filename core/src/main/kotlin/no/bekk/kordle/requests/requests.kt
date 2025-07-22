@@ -5,12 +5,12 @@ import com.badlogic.gdx.net.HttpStatus
 
 fun generateHttpRequest(
     method: Net.HttpMethods,
-    url: String = "https://api.example.com/endpoint",
+    url: String,
     body: String,
 ){
 // Create the HTTP request
     val httpRequest = Net.HttpRequest(method.toString()).apply {
-        this.url = "https://api.example.com/endpoint"
+        this.url = url
 
         // Set the request body
         this.content = """

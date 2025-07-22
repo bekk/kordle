@@ -2,7 +2,7 @@
   <configuration default="false" name="Backend" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <option name="ALTERNATIVE_JRE_PATH" value="ms-21" />
     <module name="kordle.server.main" />
-    <option name="SPRING_BOOT_MAIN_CLASS" value="no.bekk.kordle.server.ServerApplication" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="no.bekk.kordle.server.ServerApplicationKt" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

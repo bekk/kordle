@@ -1,6 +1,6 @@
 package no.bekk.kordle.server.repository
 
-import no.bekk.kordle.server.dto.Oppgave
+import no.bekk.kordle.shared.dto.Oppgave
 import org.springframework.jdbc.core.DataClassRowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.stereotype.Repository

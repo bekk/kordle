@@ -1,11 +1,11 @@
 package no.bekk.kordle.server.service
 
-import no.bekk.kordle.server.dto.BokstavTreff
-import no.bekk.kordle.server.dto.GjettOrdRequest
-import no.bekk.kordle.server.dto.Oppgave
 import no.bekk.kordle.server.exceptions.OrdetEksistererAlleredeIDatabasenException
 import no.bekk.kordle.server.exceptions.OrdetHarUgyldigLengdeException
 import no.bekk.kordle.server.repository.OppgaveRepository
+import no.bekk.kordle.shared.dto.BokstavTreff
+import no.bekk.kordle.shared.dto.GjettOrdRequest
+import no.bekk.kordle.shared.dto.Oppgave
 import org.springframework.stereotype.Service
 
 @Service
