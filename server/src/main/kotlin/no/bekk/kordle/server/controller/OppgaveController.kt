@@ -1,5 +1,6 @@
 package no.bekk.kordle.server.controller
 
+import no.bekk.kordle.server.exceptions.GjettetHarUgyldigLengdeException
 import no.bekk.kordle.server.exceptions.OrdetEksistererAlleredeIDatabasenException
 import no.bekk.kordle.server.exceptions.OrdetHarUgyldigLengdeException
 import no.bekk.kordle.server.service.OppgaveService
@@ -49,8 +50,19 @@ class OppgaveController(
 
     @PostMapping("/gjettOrd")
     fun gjettOrd(@RequestBody gjettOrdRequest: GjettOrdRequest): ResponseEntity<*> {
-        val bokstavTreff = oppgaveService.gjettOrd(gjettOrdRequest)
-        return ResponseEntity.ok().body(bokstavTreff)
+        try {
+            val bokstavTreff = oppgaveService.gjettOrd(gjettOrdRequest)
+            return ResponseEntity.ok().body(bokstavTreff)
+
+        } catch (exception: RuntimeException) {
+            val statusKodeSomSkalReturneres = when (exception) {
+                is GjettetHarUgyldigLengdeException -> HttpStatus.BAD_REQUEST
+                else -> HttpStatus.INTERNAL_SERVER_ERROR
+            }
+            return ResponseEntity
+                .status(statusKodeSomSkalReturneres)
+                .body(exception.message)
+        }
     }
 }
 

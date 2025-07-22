@@ -5,6 +5,7 @@ import no.bekk.kordle.server.exceptions.OrdetHarUgyldigLengdeException
 import no.bekk.kordle.server.repository.OppgaveRepository
 import no.bekk.kordle.shared.dto.BokstavTreff
 import no.bekk.kordle.shared.dto.GjettOrdRequest
+import no.bekk.kordle.shared.dto.GjettResponse
 import no.bekk.kordle.shared.dto.Oppgave
 import org.springframework.stereotype.Service
 
@@ -49,13 +50,20 @@ class OppgaveService(
     }
 
     // TODO: Vurder om sjekken for eksisterende ord bør gjøres i databasen istedenfor. Kanskje en oppgave i seg selv?
-    fun gjettOrd(gjettOrdRequest: GjettOrdRequest): List<BokstavTreff> {
+    fun gjettOrd(gjettOrdRequest: GjettOrdRequest): GjettResponse {
+        val ordGjett = gjettOrdRequest.ordGjett
         val oppgaveGjettetPaa = oppgaveRepository.hentOppgave(gjettOrdRequest.oppgaveId)
+        if (ordGjett.length > oppgaveGjettetPaa.ord.length){
+            throw OrdetHarUgyldigLengdeException("Gjettet '${ordGjett}' er for langt for oppgaven. Oppgaven har lengde ${oppgaveGjettetPaa.ord.length} tegn.")
+        }
         val bokstavTreff = sjekkBokstavTreff(
             oppgave = oppgaveGjettetPaa,
-            ordGjettet = gjettOrdRequest.ordGjett
+            ordGjettet = ordGjett
         )
-        return bokstavTreff
+        return GjettResponse(
+            oppgaveId = oppgaveGjettetPaa.id,
+            alleBokstavtreff = bokstavTreff
+        )
     }
 
     fun sjekkBokstavTreff(

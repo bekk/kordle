@@ -1,47 +1,75 @@
 package no.bekk.kordle.requests
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Net
 import com.badlogic.gdx.net.HttpStatus
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.decodeFromString
+import no.bekk.kordle.shared.dto.GjettOrdRequest
+import no.bekk.kordle.shared.dto.GjettResponse
 
-fun generateHttpRequest(
+// Callback-based approach
+inline fun<reified T, reified R> executeRequest(
     method: String,
-    url: String,
-    body: String,
-): Net.HttpRequest {
-// Create the HTTP request
-    val httpRequest = Net.HttpRequest(method).apply {
-        this.url = url
+    path: String,
+    body: T,
+    crossinline onSuccess: (R) -> Unit,
+    crossinline onError: (String) -> Unit
+) {
+    val httpRequest = generateHttpRequest(method, path, body)
 
-        // Set the request body
-        this.content = body.trimIndent()
-    }
+    Gdx.net.sendHttpRequest(httpRequest, object: Net.HttpResponseListener {
+        override fun handleHttpResponse(httpResponse: Net.HttpResponse) {
+            val statusCode = httpResponse.status.statusCode
+            val responseBody = httpResponse.resultAsString
 
-    return httpRequest
+            if (statusCode == HttpStatus.SC_OK) {
+                try {
+                    val result = Json.decodeFromString<R>(responseBody)
+                    onSuccess(result)
+                } catch (e: Exception) {
+                    onError("Failed to parse response: ${e.message}")
+                }
+            } else {
+                onError("HTTP Error: $statusCode - $responseBody")
+            }
+        }
+
+        override fun failed(t: Throwable?) {
+            onError("Request failed: ${t?.message ?: "Unknown error"}")
+        }
+
+        override fun cancelled() {
+            onError("Request was cancelled")
+        }
+    })
 }
 
+inline fun<reified T> generateHttpRequest(
+    method: String,
+    path: String,
+    body: T,
+): Net.HttpRequest {
+    return Net.HttpRequest(method).apply {
+        this.url = "http://localhost:8080$path"
+        this.content = Json.encodeToString(body)
+        // Set content type for JSON
+        this.setHeader("Content-Type", "application/json")
+    }
+}
 
-
-val responseListener = object : Net.HttpResponseListener {
-    override fun handleHttpResponse(httpResponse: Net.HttpResponse) {
-        val statusCode = httpResponse.status.statusCode
-        val responseBody = httpResponse.resultAsString
-
-        if (statusCode == HttpStatus.SC_OK) {
-            println("Success: $responseBody")
-            // Handle successful response
-        } else {
-            println("Error: $statusCode - $responseBody")
-            // Handle error response
+fun gjettOrd(gjettOrdRequest: GjettOrdRequest) {
+    val response = executeRequest<GjettOrdRequest, GjettResponse>(
+        method = "POST",
+        path = "/gjettOrd",
+        body = gjettOrdRequest,
+        onSuccess = { response ->
+            println("Response: $response")
+            // RENDER BOXES HERE
+        },
+        onError = { error ->
+            println("Error occurred: $error")
+            // Handle error here
         }
-    }
-
-    override fun failed(t: Throwable) {
-        println("Request failed: ${t.message}")
-        // Handle network failure
-    }
-
-    override fun cancelled() {
-        println("Request cancelled")
-        // Handle cancellation
-    }
+    )
 }

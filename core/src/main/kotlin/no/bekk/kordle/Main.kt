@@ -16,9 +16,10 @@ import ktx.assets.disposeSafely
 import ktx.assets.toInternalFile
 import ktx.async.KtxAsync
 import ktx.scene2d.*
-import no.bekk.kordle.requests.generateHttpRequest
-import no.bekk.kordle.requests.responseListener
+import no.bekk.kordle.requests.executeRequest
+import no.bekk.kordle.requests.gjettOrd
 import no.bekk.kordle.shared.dto.GjettOrdRequest
+import no.bekk.kordle.shared.dto.GjettResponse
 
 class Main : KtxGame<KtxScreen>() {
     override fun create() {
@@ -50,18 +51,11 @@ class FirstScreen : KtxScreen {
                 table.button {
                     label("[ENT]")
                     onClick {
-                        val jsonString = Json.encodeToString(GjettOrdRequest(
+                        val gjettOrdRequest = GjettOrdRequest(
                             oppgaveId = 1,
                             ordGjett = value.uppercase()
-                        ))
-                        val request = generateHttpRequest(
-                            url = "http://localhost:8080/gjettOrd",
-                            method = Net.HttpMethods.POST,
-                            body = jsonString
                         )
-                        val responseListener = responseListener
-
-                        Gdx.net.sendHttpRequest(request, responseListener)
+                        gjettOrd(gjettOrdRequest)
 
                         println("Entered value $value")
                     }
@@ -95,7 +89,7 @@ class FirstScreen : KtxScreen {
     }
 
     private fun addLetter(letter: Char) {
-        if (value.length >= 6) return // Limit to 5 characters
+        if (value.length >= 6) return
         value += letter
         valueLabel.setText(value.uppercase())
     }

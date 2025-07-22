@@ -17,6 +17,6 @@ POST localhost:8080/gjettOrd
 Content-Type: application/json
 
 {
-  "oppgaveId": 30501,
-  "ordGjett": "morsom"
+  "oppgaveId": 1,
+  "ordGjett": "test"
 }
