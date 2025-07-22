@@ -1,11 +1,13 @@
 package no.bekk.kordle
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Net
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.utils.viewport.ScreenViewport
+import kotlinx.serialization.json.Json
 import ktx.actors.onClick
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
@@ -14,6 +16,9 @@ import ktx.assets.disposeSafely
 import ktx.assets.toInternalFile
 import ktx.async.KtxAsync
 import ktx.scene2d.*
+import no.bekk.kordle.requests.generateHttpRequest
+import no.bekk.kordle.requests.responseListener
+import no.bekk.kordle.shared.dto.GjettOrdRequest
 
 class Main : KtxGame<KtxScreen>() {
     override fun create() {
@@ -45,6 +50,19 @@ class FirstScreen : KtxScreen {
                 table.button {
                     label("[ENT]")
                     onClick {
+                        val jsonString = Json.encodeToString(GjettOrdRequest(
+                            oppgaveId = 1,
+                            ordGjett = value.uppercase()
+                        ))
+                        val request = generateHttpRequest(
+                            url = "http://localhost:8080/gjettOrd",
+                            method = Net.HttpMethods.POST,
+                            body = jsonString
+                        )
+                        val responseListener = responseListener
+
+                        Gdx.net.sendHttpRequest(request, responseListener)
+
                         println("Entered value $value")
                     }
                 }
