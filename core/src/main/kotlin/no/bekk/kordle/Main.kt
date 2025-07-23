@@ -47,7 +47,7 @@ class FirstScreen : KtxScreen {
             guessRows = (0 until maxGuesses).map {
                 GuessRow(this, 6)
             }.toMutableList()
-            it.fillX()
+            it
                 .expandX()
                 .spaceBottom(20f)
         }

@@ -11,7 +11,7 @@ class GuessRow(parent: KTableWidget, private val length: Int) {
     init {
         parent.row()
         boxes = (0 until length).map {
-            GuessBox(parent)
+            GuessBox(parent, it)
         }.toMutableList()
     }
 
