@@ -4,12 +4,11 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Net
 import com.badlogic.gdx.net.HttpStatus
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.decodeFromString
 import no.bekk.kordle.shared.dto.GjettOrdRequest
 import no.bekk.kordle.shared.dto.GjettResponse
 
 // Callback-based approach
-inline fun<reified T, reified R> executeRequest(
+inline fun <reified T, reified R> executeRequest(
     method: String,
     path: String,
     body: T,
@@ -18,7 +17,7 @@ inline fun<reified T, reified R> executeRequest(
 ) {
     val httpRequest = generateHttpRequest(method, path, body)
 
-    Gdx.net.sendHttpRequest(httpRequest, object: Net.HttpResponseListener {
+    Gdx.net.sendHttpRequest(httpRequest, object : Net.HttpResponseListener {
         override fun handleHttpResponse(httpResponse: Net.HttpResponse) {
             val statusCode = httpResponse.status.statusCode
             val responseBody = httpResponse.resultAsString
@@ -45,7 +44,7 @@ inline fun<reified T, reified R> executeRequest(
     })
 }
 
-inline fun<reified T> generateHttpRequest(
+inline fun <reified T> generateHttpRequest(
     method: String,
     path: String,
     body: T,
