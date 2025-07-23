@@ -1,13 +1,10 @@
 package no.bekk.kordle
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Net
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.utils.viewport.ScreenViewport
-import kotlinx.serialization.json.Json
 import ktx.actors.onClick
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
@@ -16,10 +13,9 @@ import ktx.assets.disposeSafely
 import ktx.assets.toInternalFile
 import ktx.async.KtxAsync
 import ktx.scene2d.*
-import no.bekk.kordle.requests.executeRequest
 import no.bekk.kordle.requests.gjettOrd
 import no.bekk.kordle.shared.dto.GjettOrdRequest
-import no.bekk.kordle.shared.dto.GjettResponse
+import no.bekk.kordle.widgets.GuessRow
 
 class Main : KtxGame<KtxScreen>() {
     override fun create() {
@@ -33,15 +29,23 @@ class Main : KtxGame<KtxScreen>() {
 class FirstScreen : KtxScreen {
     private val batch = SpriteBatch()
     private val stage = Stage(ScreenViewport()).also { Gdx.input.inputProcessor = it }
+
     private var value = ""
-    private val valueLabel: Label
+    private val maxGuesses = 6
+    private var currentGuessIndex = 0
+    private val guessRows: MutableList<GuessRow>
+
+    private val currentGuessRow: GuessRow
+        get() = guessRows[currentGuessIndex]
 
     init {
         Scene2DSkin.defaultSkin = Skin("skins/default/uiskin.json".toInternalFile())
         val table = scene2d.table {
             setFillParent(true)
-            valueLabel = label(value).cell(colspan = 5)
         }
+        guessRows = (0 until maxGuesses).map {
+            GuessRow(table, 6)
+        }.toMutableList()
         val lines = listOf("qwertyuiop", "asdfghjkl", "zxcvbnm")
         lines.forEachIndexed { i, line ->
             // row with 5 buttons
@@ -56,6 +60,10 @@ class FirstScreen : KtxScreen {
                             ordGjett = value.uppercase()
                         )
                         gjettOrd(gjettOrdRequest)
+                        if (currentGuessIndex < maxGuesses - 1) {
+                            currentGuessIndex++
+                        }
+                        value = ""
 
                         println("Entered value $value")
                     }
@@ -79,7 +87,7 @@ class FirstScreen : KtxScreen {
             onClick {
                 if (value.isNotEmpty()) {
                     value = value.dropLast(1)
-                    valueLabel.setText(value.uppercase())
+                    currentGuessRow.removeLetter()
                 }
             }
         }
@@ -91,7 +99,7 @@ class FirstScreen : KtxScreen {
     private fun addLetter(letter: Char) {
         if (value.length >= 6) return
         value += letter
-        valueLabel.setText(value.uppercase())
+        currentGuessRow.addLetter(letter)
     }
 
     override fun render(delta: Float) {
