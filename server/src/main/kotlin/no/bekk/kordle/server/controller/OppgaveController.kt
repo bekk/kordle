@@ -7,6 +7,7 @@ import no.bekk.kordle.server.service.OppgaveService
 import no.bekk.kordle.shared.dto.GjettOrdRequest
 import no.bekk.kordle.shared.dto.LeggTilOrdRequest
 import no.bekk.kordle.shared.dto.Oppgave
+import no.bekk.kordle.shared.dto.OppgaveResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -25,7 +26,7 @@ class OppgaveController(
     }
 
     @GetMapping("/hentTilfeldigOppgave")
-    fun hentTilfeldigOppgave(): Oppgave {
+    fun hentTilfeldigOppgave(): OppgaveResponse {
         return oppgaveService.hentTilfeldigOppgave()
     }
 
@@ -34,7 +35,7 @@ class OppgaveController(
         try {
             val ordSomSkalLeggesTil = leggTilOrdRequest.ord
             val ordSomBleLagtTil = oppgaveService.leggTilOrd(ordSomSkalLeggesTil)
-            return ResponseEntity.ok().body<Oppgave>(ordSomBleLagtTil)
+            return ResponseEntity.ok().body<OppgaveResponse>(ordSomBleLagtTil)
 
         } catch (exception: RuntimeException) {
             val statusKodeSomSkalReturneres = when (exception) {

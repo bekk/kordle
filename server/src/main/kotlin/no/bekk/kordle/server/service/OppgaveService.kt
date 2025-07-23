@@ -7,6 +7,7 @@ import no.bekk.kordle.shared.dto.BokstavTreff
 import no.bekk.kordle.shared.dto.GjettOrdRequest
 import no.bekk.kordle.shared.dto.GjettResponse
 import no.bekk.kordle.shared.dto.Oppgave
+import no.bekk.kordle.shared.dto.OppgaveResponse
 import org.springframework.stereotype.Service
 
 @Service
@@ -14,13 +15,13 @@ class OppgaveService(
     val oppgaveRepository: OppgaveRepository
 ) {
 
-    fun hentTilfeldigOppgave(): Oppgave {
+    fun hentTilfeldigOppgave(): OppgaveResponse {
         val alleOppgaver = oppgaveRepository.hentAlleOppgaver()
-        return alleOppgaver.random()
+        return alleOppgaver.random().tilOppgaveResponse()
     }
 
     // TODO: Vurder om sjekken for eksisterende ord bør gjøres i databasen istedenfor. Kanskje en oppgave i seg selv?
-    fun leggTilOrd(ordSomSkalLeggesTil:String): Oppgave {
+    fun leggTilOrd(ordSomSkalLeggesTil:String): OppgaveResponse {
         val erOrdetGyldigLengde = ordSomSkalLeggesTil.length in 4..6
         if (!erOrdetGyldigLengde) {
             throw OrdetHarUgyldigLengdeException("Ordet '$ordSomSkalLeggesTil' må ha en lengde mellom 4 og 6 tegn.")
@@ -42,9 +43,8 @@ class OppgaveService(
             ord = ordSomSkalLeggesTil,
             lengde = ordSomSkalLeggesTil.length
         )
-        return Oppgave(
+        return OppgaveResponse(
             id = idTilNyopprettetOppgave,
-            ord = ordSomSkalLeggesTil,
             lengde = ordSomSkalLeggesTil.length
         )
     }
