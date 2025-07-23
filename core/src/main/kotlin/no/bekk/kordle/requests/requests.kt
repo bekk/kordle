@@ -57,14 +57,16 @@ inline fun <reified T> generateHttpRequest(
     }
 }
 
-fun gjettOrd(gjettOrdRequest: GjettOrdRequest) {
+fun gjettOrd(
+    gjettOrdRequest: GjettOrdRequest,
+    onSuccess: (GjettResponse) -> Unit
+) {
     val response = executeRequest<GjettOrdRequest, GjettResponse>(
         method = "POST",
         path = "/gjettOrd",
         body = gjettOrdRequest,
         onSuccess = { response ->
-            println("Response: $response")
-            // RENDER BOXES HERE
+            onSuccess(response)
         },
         onError = { error ->
             println("Error occurred: $error")
