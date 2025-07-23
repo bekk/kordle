@@ -46,6 +46,12 @@ class FirstScreen : KtxScreen {
         guessRows = (0 until maxGuesses).map {
             GuessRow(rootTable, 6)
         }.toMutableList()
+        setupKeyboard(rootTable)
+
+        stage.addActor(rootTable)
+    }
+
+    private fun setupKeyboard(rootTable: KTableWidget) {
         val lines = listOf("qwertyuiop", "asdfghjkl", "zxcvbnm")
         lines.forEachIndexed { i, line ->
             // row with 5 buttons
@@ -91,8 +97,6 @@ class FirstScreen : KtxScreen {
                 }
             }
         }
-
-        stage.addActor(rootTable)
     }
 
     private fun addLetter(letter: Char) {
