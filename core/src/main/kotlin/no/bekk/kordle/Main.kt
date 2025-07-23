@@ -40,19 +40,19 @@ class FirstScreen : KtxScreen {
 
     init {
         Scene2DSkin.defaultSkin = Skin("skins/default/uiskin.json".toInternalFile())
-        val table = scene2d.table {
+        val rootTable = scene2d.table {
             setFillParent(true)
         }
         guessRows = (0 until maxGuesses).map {
-            GuessRow(table, 6)
+            GuessRow(rootTable, 6)
         }.toMutableList()
         val lines = listOf("qwertyuiop", "asdfghjkl", "zxcvbnm")
         lines.forEachIndexed { i, line ->
             // row with 5 buttons
-            table.row()
+            rootTable.row()
             if (i == lines.size - 1) {
                 // Add a spacer for the last row to align with the delete button
-                table.button {
+                rootTable.button {
                     label("[ENT]")
                     onClick {
                         val gjettOrdRequest = GjettOrdRequest(
@@ -70,7 +70,7 @@ class FirstScreen : KtxScreen {
                 }
             }
             line.forEach { letter ->
-                table.button {
+                rootTable.button {
                     label(letter.uppercase())
                     onClick {
                         addLetter(letter)
@@ -82,7 +82,7 @@ class FirstScreen : KtxScreen {
                 }
             }
         }
-        table.button {
+        rootTable.button {
             label("[DEL]")
             onClick {
                 if (value.isNotEmpty()) {
@@ -91,9 +91,9 @@ class FirstScreen : KtxScreen {
                 }
             }
         }
-        table.rows
+        rootTable.rows
 
-        stage.addActor(table)
+        stage.addActor(rootTable)
     }
 
     private fun addLetter(letter: Char) {
