@@ -1,11 +1,13 @@
 package no.bekk.kordle
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Net
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.utils.viewport.ScreenViewport
+import kotlinx.serialization.json.Json
 import ktx.actors.onClick
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
@@ -14,6 +16,10 @@ import ktx.assets.disposeSafely
 import ktx.assets.toInternalFile
 import ktx.async.KtxAsync
 import ktx.scene2d.*
+import no.bekk.kordle.requests.executeRequest
+import no.bekk.kordle.requests.gjettOrd
+import no.bekk.kordle.shared.dto.GjettOrdRequest
+import no.bekk.kordle.shared.dto.GjettResponse
 
 class Main : KtxGame<KtxScreen>() {
     override fun create() {
@@ -45,6 +51,12 @@ class FirstScreen : KtxScreen {
                 table.button {
                     label("[ENT]")
                     onClick {
+                        val gjettOrdRequest = GjettOrdRequest(
+                            oppgaveId = 1,
+                            ordGjett = value.uppercase()
+                        )
+                        gjettOrd(gjettOrdRequest)
+
                         println("Entered value $value")
                     }
                 }
@@ -77,7 +89,7 @@ class FirstScreen : KtxScreen {
     }
 
     private fun addLetter(letter: Char) {
-        if (value.length >= 5) return // Limit to 5 characters
+        if (value.length >= 6) return
         value += letter
         valueLabel.setText(value.uppercase())
     }
