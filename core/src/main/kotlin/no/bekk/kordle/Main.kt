@@ -51,14 +51,14 @@ class FirstScreen : KtxScreen {
         stage.addActor(rootTable)
     }
 
-    private fun setupKeyboard(rootTable: KTableWidget) {
+    private fun setupKeyboard(parent: KTableWidget) {
         val lines = listOf("qwertyuiop", "asdfghjkl", "zxcvbnm")
         lines.forEachIndexed { i, line ->
             // row with 5 buttons
-            rootTable.row()
+            parent.row()
             if (i == lines.size - 1) {
                 // Add a spacer for the last row to align with the delete button
-                rootTable.button {
+                parent.button {
                     label("[ENT]")
                     onClick {
                         val gjettOrdRequest = GjettOrdRequest(
@@ -76,7 +76,7 @@ class FirstScreen : KtxScreen {
                 }
             }
             line.forEach { letter ->
-                rootTable.button {
+                parent.button {
                     label(letter.uppercase())
                     onClick {
                         addLetter(letter)
@@ -88,7 +88,7 @@ class FirstScreen : KtxScreen {
                 }
             }
         }
-        rootTable.button {
+        parent.button {
             label("[DEL]")
             onClick {
                 if (value.isNotEmpty()) {
