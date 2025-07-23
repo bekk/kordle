@@ -75,13 +75,13 @@ class FirstScreen : KtxScreen {
                                 oppgaveId = 1,
                                 ordGjett = value.uppercase()
                             )
-                            gjettOrd(gjettOrdRequest) {
-                                println("Response received: $it")
+                            gjettOrd(gjettOrdRequest) { response ->
+                                currentGuessRow.markGuess(response)
+                                if (currentGuessIndex < maxGuesses - 1) {
+                                    currentGuessIndex++
+                                }
+                                value = ""
                             }
-                            if (currentGuessIndex < maxGuesses - 1) {
-                                currentGuessIndex++
-                            }
-                            value = ""
                         }
                     }
                 }
