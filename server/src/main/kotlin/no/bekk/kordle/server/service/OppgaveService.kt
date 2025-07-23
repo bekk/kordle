@@ -3,11 +3,7 @@ package no.bekk.kordle.server.service
 import no.bekk.kordle.server.exceptions.OrdetEksistererAlleredeIDatabasenException
 import no.bekk.kordle.server.exceptions.OrdetHarUgyldigLengdeException
 import no.bekk.kordle.server.repository.OppgaveRepository
-import no.bekk.kordle.shared.dto.BokstavTreff
-import no.bekk.kordle.shared.dto.GjettOrdRequest
-import no.bekk.kordle.shared.dto.GjettResponse
-import no.bekk.kordle.shared.dto.Oppgave
-import no.bekk.kordle.shared.dto.OppgaveResponse
+import no.bekk.kordle.shared.dto.*
 import org.springframework.stereotype.Service
 
 @Service
@@ -21,7 +17,7 @@ class OppgaveService(
     }
 
     // TODO: Vurder om sjekken for eksisterende ord bør gjøres i databasen istedenfor. Kanskje en oppgave i seg selv?
-    fun leggTilOrd(ordSomSkalLeggesTil:String): OppgaveResponse {
+    fun leggTilOrd(ordSomSkalLeggesTil: String): OppgaveResponse {
         val erOrdetGyldigLengde = ordSomSkalLeggesTil.length in 4..6
         if (!erOrdetGyldigLengde) {
             throw OrdetHarUgyldigLengdeException("Ordet '$ordSomSkalLeggesTil' må ha en lengde mellom 4 og 6 tegn.")
@@ -53,7 +49,7 @@ class OppgaveService(
     fun gjettOrd(gjettOrdRequest: GjettOrdRequest): GjettResponse {
         val ordGjett = gjettOrdRequest.ordGjett
         val oppgaveGjettetPaa = oppgaveRepository.hentOppgave(gjettOrdRequest.oppgaveId)
-        if (ordGjett.length > oppgaveGjettetPaa.ord.length){
+        if (ordGjett.length > oppgaveGjettetPaa.ord.length) {
             throw OrdetHarUgyldigLengdeException("Gjettet '${ordGjett}' er for langt for oppgaven. Oppgaven har lengde ${oppgaveGjettetPaa.ord.length} tegn.")
         }
         val bokstavTreff = sjekkBokstavTreff(
