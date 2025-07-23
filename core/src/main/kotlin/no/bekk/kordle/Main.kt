@@ -91,7 +91,6 @@ class FirstScreen : KtxScreen {
                 }
             }
         }
-        rootTable.rows
 
         stage.addActor(rootTable)
     }
