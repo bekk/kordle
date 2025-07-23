@@ -109,6 +109,11 @@
     default: {
       font: default-font,
       fontColor: white
+    },
+    background: {
+      font: default-font,
+      fontColor: white,
+      background: default-pane
     }
   },
   TextFieldStyle: {

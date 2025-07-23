@@ -5,7 +5,7 @@ import ktx.scene2d.KTableWidget
 import ktx.scene2d.label
 
 class GuessBox(parent: KTableWidget) {
-    private val label: Label = parent.label("") {
+    private val label: Label = parent.label("", style = "background") {
         it.width(40f).height(40f)
             .spaceLeft(10f).spaceBottom(10f)
             .expandX().growX()
