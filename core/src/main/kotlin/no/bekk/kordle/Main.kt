@@ -43,10 +43,19 @@ class FirstScreen : KtxScreen {
         val rootTable = scene2d.table {
             setFillParent(true)
         }
-        guessRows = (0 until maxGuesses).map {
-            GuessRow(rootTable, 6)
-        }.toMutableList()
-        setupKeyboard(rootTable)
+        rootTable.table {
+            guessRows = (0 until maxGuesses).map {
+                GuessRow(this, 6)
+            }.toMutableList()
+            it.fillX()
+                .expandX()
+                .spaceBottom(20f)
+        }
+        rootTable.row()
+        rootTable.table {
+            setupKeyboard(this)
+            it.fillX().expandX()
+        }
 
         stage.addActor(rootTable)
     }
