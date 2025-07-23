@@ -66,8 +66,8 @@ class OppgaveService(
         oppgave: Oppgave,
         ordGjettet: String
     ): List<BokstavTreff> {
-        val ordIOppgave = oppgave.ord
-        return ordGjettet.mapIndexed { index, bokstav ->
+        val ordIOppgave = oppgave.ord.lowercase()
+        return ordGjettet.lowercase().mapIndexed { index, bokstav ->
             BokstavTreff(
                 plassISekvensen = index,
                 bokstavGjettet = bokstav.toString(),
