@@ -65,44 +65,48 @@ class FirstScreen : KtxScreen {
         lines.forEachIndexed { i, line ->
             // row with 5 buttons
             parent.row()
-            if (i == lines.size - 1) {
-                // Add a spacer for the last row to align with the delete button
-                parent.button {
-                    label("[ENT]")
-                    onClick {
-                        val gjettOrdRequest = GjettOrdRequest(
-                            oppgaveId = 1,
-                            ordGjett = value.uppercase()
-                        )
-                        gjettOrd(gjettOrdRequest)
-                        if (currentGuessIndex < maxGuesses - 1) {
-                            currentGuessIndex++
-                        }
-                        value = ""
+            parent.table {
+                if (i == lines.size - 1) {
+                    // Add a spacer for the last row to align with the delete button
+                    button {
+                        label("[ENT]")
+                        onClick {
+                            val gjettOrdRequest = GjettOrdRequest(
+                                oppgaveId = 1,
+                                ordGjett = value.uppercase()
+                            )
+                            gjettOrd(gjettOrdRequest)
+                            if (currentGuessIndex < maxGuesses - 1) {
+                                currentGuessIndex++
+                            }
+                            value = ""
 
-                        println("Entered value $value")
+                            println("Entered value $value")
+                        }
                     }
                 }
-            }
-            line.forEach { letter ->
-                parent.button {
-                    label(letter.uppercase())
-                    onClick {
-                        addLetter(letter)
+                line.forEach { letter ->
+                    button {
+                        label(letter.uppercase())
+                        onClick {
+                            addLetter(letter)
+                        }
+                        it
+                            .width(50f).height(50f)
+                            .spaceLeft(10f).spaceBottom(10f)
+                            .expandX().growX()
                     }
-                    it
-                        .width(50f).height(50f)
-                        .spaceLeft(10f).spaceBottom(10f)
-                        .expandX().growX()
                 }
-            }
-        }
-        parent.button {
-            label("[DEL]")
-            onClick {
-                if (value.isNotEmpty()) {
-                    value = value.dropLast(1)
-                    currentGuessRow.removeLetter()
+                if (i == lines.size - 1) {
+                    button {
+                        label("[DEL]")
+                        onClick {
+                            if (value.isNotEmpty()) {
+                                value = value.dropLast(1)
+                                currentGuessRow.removeLetter()
+                            }
+                        }
+                    }
                 }
             }
         }
