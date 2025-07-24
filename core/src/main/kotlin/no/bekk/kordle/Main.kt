@@ -58,6 +58,11 @@ class FirstScreen : KtxScreen {
         val rootTable = scene2d.table {
             setFillParent(true)
         }
+        rootTable.label("KORDLE", "large") {
+            color = BekkColors.Natt
+            it.spaceBottom(20f)
+        }
+        rootTable.row()
         rootTable.table {
             guessRows = (0 until maxGuesses).map {
                 GuessRow(this, 6)
