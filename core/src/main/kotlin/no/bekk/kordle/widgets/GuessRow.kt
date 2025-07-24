@@ -39,6 +39,9 @@ class GuessRow(parent: KTableWidget, private val length: Int) {
                 }
             )
         }
+        (guessResult.alleBokstavtreff.size..boxes.size - 1).forEach { i ->
+            boxes[i].setStatus(LetterGuessStatus.NOT_IN_WORD)
+        }
     }
 
     fun setIsActive() {
