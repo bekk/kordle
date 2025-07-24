@@ -99,8 +99,8 @@ class FirstScreen : KtxScreen {
                             addLetter(letter)
                         }
                         it
-                            .width(30f).height(30f)
-                            .pad(4f)
+                            .width(24f).height(40f)
+                            .pad(2f)
                             .expandX().growX()
                     }
                 }
@@ -123,18 +123,18 @@ class FirstScreen : KtxScreen {
         val assetManager = initiateAssetManager()
 
         assetManager.load(
-            "sourceSans24.ttf",
+            "sourceSans30.ttf",
             BitmapFont::class.java,
             freeTypeFontParameters("fonts/source-sans-3/SourceSans3-ExtraBold.ttf") {
-                size = 24
+                size = 30
                 color = Color.WHITE
             }
         )
         assetManager.load(
-            "sourceSans14.ttf",
+            "sourceSans24.ttf",
             BitmapFont::class.java,
             freeTypeFontParameters("fonts/source-sans-3/SourceSans3-Bold.ttf") {
-                size = 14
+                size = 24
                 color = Color.WHITE
                 characters = FreeTypeFontGenerator.DEFAULT_CHARS + "⌫✓"
             }
@@ -142,14 +142,14 @@ class FirstScreen : KtxScreen {
         assetManager.finishLoading()
 
         return Skin("skins/default/uiskin.json".toInternalFile()).apply {
+            add("sourceSans30", assetManager["sourceSans30.ttf", BitmapFont::class.java])
             add("sourceSans24", assetManager["sourceSans24.ttf", BitmapFont::class.java])
-            add("sourceSans14", assetManager["sourceSans14.ttf", BitmapFont::class.java])
             label("small") {
-                font = getFont("sourceSans14")
+                font = getFont("sourceSans24")
                 fontColor = Color.WHITE
             }
             label("large") {
-                font = getFont("sourceSans24")
+                font = getFont("sourceSans30")
                 fontColor = Color.WHITE
             }
         }
