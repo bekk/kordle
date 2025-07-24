@@ -53,6 +53,9 @@ class FirstScreen : KtxScreen {
     private val currentGuessRow: GuessRow
         get() = guessRows[currentGuessIndex]
 
+    private val buttonByCharacter = mutableMapOf<Char, KButton>()
+    private val bestGuessByCharacter = mutableMapOf<Char, LetterGuessStatus>()
+
     init {
         Scene2DSkin.defaultSkin = createSkin()
         val rootTable = scene2d.table {
@@ -113,6 +116,21 @@ class FirstScreen : KtxScreen {
         }
     }
 
+    private fun updateBestGuess(letter: Char, guessStatus: LetterGuessStatus) {
+        val currentBestStatus = bestGuessByCharacter.getOrDefault(letter, LetterGuessStatus.NOT_GUESSED)
+        if (guessStatus > currentBestStatus) {
+            bestGuessByCharacter[letter] = guessStatus
+            buttonByCharacter[letter]?.apply {
+                color = when (guessStatus) {
+                    LetterGuessStatus.NOT_IN_WORD -> BekkColors.Natt
+                    LetterGuessStatus.WRONG_POSITION -> BekkColors.Ild1
+                    LetterGuessStatus.CORRECT_POSITION -> BekkColors.Jord1
+                    else -> BekkColors.Vann1
+                }
+            }
+        }
+    }
+
     private fun submit() {
         val gjettOrdRequest = GjettOrdRequest(
             oppgaveId = 1,
@@ -120,6 +138,9 @@ class FirstScreen : KtxScreen {
         )
         gjettOrd(gjettOrdRequest) { response ->
             currentGuessRow.markGuess(response)
+            response.alleBokstavtreff.forEach { result ->
+                updateBestGuess(result.bokstavGjettet[0].lowercaseChar(), LetterGuessStatus.fromResponse(result))
+            }
             if (currentGuessIndex < maxGuesses - 1) {
                 currentGuessIndex++
             }
@@ -131,6 +152,10 @@ class FirstScreen : KtxScreen {
         value = ""
         currentGuessIndex = 0
         guessRows.forEach { it.reset() } // Reset all guesses
+        bestGuessByCharacter.clear() // Clear the best guesses
+        buttonByCharacter.forEach { (_, button) ->
+            button.color = BekkColors.Vann1 // Reset button colors
+        }
     }
 
     fun removeLetter() {
@@ -158,7 +183,7 @@ class FirstScreen : KtxScreen {
                     }
                 }
                 line.forEach { letter ->
-                    button {
+                    val b = button {
                         label(letter.uppercase(), "small")
                         color = BekkColors.Vann1
                         onClick {
@@ -168,6 +193,7 @@ class FirstScreen : KtxScreen {
                             .width(24f).height(40f)
                             .pad(2f)
                     }
+                    buttonByCharacter[letter] = b
                 }
                 if (i == lines.size - 1) {
                     button {
