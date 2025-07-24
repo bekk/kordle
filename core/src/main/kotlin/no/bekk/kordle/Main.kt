@@ -5,6 +5,7 @@ import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.utils.ScreenUtils
@@ -75,7 +76,7 @@ class FirstScreen : KtxScreen {
                 if (i == lines.size - 1) {
                     // Add a spacer for the last row to align with the delete button
                     button {
-                        label("[ENT]")
+                        label("✓", "small")
                         onClick {
                             val gjettOrdRequest = GjettOrdRequest(
                                 oppgaveId = 1,
@@ -98,14 +99,14 @@ class FirstScreen : KtxScreen {
                             addLetter(letter)
                         }
                         it
-                            .width(50f).height(50f)
-                            .spaceLeft(10f).spaceBottom(10f)
+                            .width(30f).height(30f)
+                            .pad(4f)
                             .expandX().growX()
                     }
                 }
                 if (i == lines.size - 1) {
                     button {
-                        label("[DEL]")
+                        label("⌫", "small")
                         onClick {
                             if (value.isNotEmpty()) {
                                 value = value.dropLast(1)
@@ -135,10 +136,11 @@ class FirstScreen : KtxScreen {
             freeTypeFontParameters("fonts/source-sans-3/SourceSans3-Bold.ttf") {
                 size = 14
                 color = Color.WHITE
+                characters = FreeTypeFontGenerator.DEFAULT_CHARS + "⌫✓"
             }
         )
         assetManager.finishLoading()
-        
+
         return Skin("skins/default/uiskin.json".toInternalFile()).apply {
             add("sourceSans24", assetManager["sourceSans24.ttf", BitmapFont::class.java])
             add("sourceSans14", assetManager["sourceSans14.ttf", BitmapFont::class.java])
