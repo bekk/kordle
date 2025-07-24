@@ -4,11 +4,11 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import com.badlogic.gdx.utils.ScreenUtils
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import ktx.actors.onClick
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
-import ktx.app.clearScreen
 import ktx.assets.disposeSafely
 import ktx.assets.toInternalFile
 import ktx.async.KtxAsync
@@ -119,7 +119,7 @@ class FirstScreen : KtxScreen {
     }
 
     override fun render(delta: Float) {
-        clearScreen(red = 0.7f, green = 0.7f, blue = 0.7f)
+        ScreenUtils.clear(BekkColors.Dag)
         stage.act(delta)
         stage.draw()
     }
