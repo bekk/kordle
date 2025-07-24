@@ -69,6 +69,7 @@ class FirstScreen : KtxScreen {
             }.toMutableList()
             it
                 .expandX()
+                .expandY()
                 .spaceBottom(20f)
         }
         rootTable.row()
@@ -149,29 +150,34 @@ class FirstScreen : KtxScreen {
                     // Add a spacer for the last row to align with the delete button
                     button {
                         label("✓", "small")
+                        color = BekkColors.Vann1
                         onClick {
                             submit()
                         }
+                        it.width(40f)
                     }
                 }
                 line.forEach { letter ->
                     button {
                         label(letter.uppercase(), "small")
+                        color = BekkColors.Vann1
                         onClick {
                             addLetter(letter)
                         }
                         it
                             .width(24f).height(40f)
                             .pad(2f)
-                            .expandX().growX()
                     }
                 }
                 if (i == lines.size - 1) {
                     button {
                         label("⌫", "small")
+                        color = BekkColors.Vann1
+
                         onClick {
                             removeLetter()
                         }
+                        it.width(40f)
                     }
                 }
             }
@@ -200,7 +206,7 @@ class FirstScreen : KtxScreen {
         )
         assetManager.finishLoading()
 
-        return Skin("skins/default/uiskin.json".toInternalFile()).apply {
+        return Skin("skins/new/KordleNew.json".toInternalFile()).apply {
             add("sourceSans30", assetManager["sourceSans30.ttf", BitmapFont::class.java])
             add("sourceSans24", assetManager["sourceSans24.ttf", BitmapFont::class.java])
             label("small") {
