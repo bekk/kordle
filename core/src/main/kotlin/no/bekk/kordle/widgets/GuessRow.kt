@@ -4,7 +4,7 @@ import ktx.scene2d.KTableWidget
 import no.bekk.kordle.LetterGuessStatus
 import no.bekk.kordle.shared.dto.GjettResponse
 
-class GuessRow(parent: KTableWidget, private val length: Int) {
+class GuessRow(private val parent: KTableWidget, private val length: Int) {
     private var value = ""
     private val boxes: MutableList<GuessBox>
 

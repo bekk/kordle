@@ -23,6 +23,7 @@ import ktx.freetype.freeTypeFontParameters
 import ktx.freetype.registerFreeTypeFontLoaders
 import ktx.scene2d.*
 import ktx.style.label
+import no.bekk.kordle.requests.getTilfeldigOppgave
 import no.bekk.kordle.requests.gjettOrd
 import no.bekk.kordle.shared.dto.GjettOrdRequest
 import no.bekk.kordle.widgets.GuessRow
@@ -48,15 +49,35 @@ class FirstScreen : KtxScreen {
             currentGuessRow.setIsActive()
         }
 
-    private val guessRows: MutableList<GuessRow>
+    private var guessRows: MutableList<GuessRow> = mutableListOf()
 
     private val currentGuessRow: GuessRow
         get() = guessRows[currentGuessIndex]
 
     private val buttonByCharacter = mutableMapOf<Char, KButton>()
     private val bestGuessByCharacter = mutableMapOf<Char, LetterGuessStatus>()
+    private val guessTable: KTableWidget
+
+    private var oppgaveId = -1
+    private var wordLength = 6
+        set(value) {
+            field = value
+            buildGuessRows()
+        }// Default word length, can be updated from the server
+
+    private fun buildGuessRows() {
+        guessTable.clearChildren()
+        guessRows = (0 until maxGuesses).map {
+            GuessRow(guessTable, wordLength)
+        }.toMutableList()
+    }
 
     init {
+        getTilfeldigOppgave {
+            oppgaveId = it.id
+            wordLength = it.lengde
+        }
+
         Scene2DSkin.defaultSkin = createSkin()
         val rootTable = scene2d.table {
             setFillParent(true)
@@ -66,15 +87,13 @@ class FirstScreen : KtxScreen {
             it.spaceBottom(20f)
         }
         rootTable.row()
-        rootTable.table {
-            guessRows = (0 until maxGuesses).map {
-                GuessRow(this, 6)
-            }.toMutableList()
+        guessTable = rootTable.table {
             it
                 .expandX()
                 .expandY()
                 .spaceBottom(20f)
         }
+        buildGuessRows()
         rootTable.row()
         rootTable.table {
             setupKeyboard(this)
@@ -105,8 +124,16 @@ class FirstScreen : KtxScreen {
 
                     else -> {
                         val letter = Input.Keys.toString(keycode)
-                        if (letter.length == 1 && letter[0] in 'A'..'Z') {
-                            addLetter(letter[0].lowercaseChar())
+                        val norwegianLetter = mapOf('\'' to 'æ', ';' to 'ø', '[' to 'å')
+                        if (letter.length == 1) {
+                            val char = letter[0]
+                            if (char in norwegianLetter) {
+                                addLetter(norwegianLetter[char] ?: char)
+                                return super.keyDown(event, keycode)
+                            } else if (char in 'A'..'Z') {
+                                addLetter(char.lowercaseChar())
+                                return super.keyDown(event, keycode)
+                            }
                         }
                     }
                 }
@@ -115,6 +142,7 @@ class FirstScreen : KtxScreen {
             }
         }
     }
+
 
     private fun updateBestGuess(letter: Char, guessStatus: LetterGuessStatus) {
         val currentBestStatus = bestGuessByCharacter.getOrDefault(letter, LetterGuessStatus.NOT_GUESSED)
@@ -132,8 +160,9 @@ class FirstScreen : KtxScreen {
     }
 
     private fun submit() {
+        if (oppgaveId == -1) return
         val gjettOrdRequest = GjettOrdRequest(
-            oppgaveId = 1,
+            oppgaveId = oppgaveId,
             ordGjett = value.uppercase()
         )
         gjettOrd(gjettOrdRequest) { response ->
@@ -166,7 +195,7 @@ class FirstScreen : KtxScreen {
     }
 
     private fun setupKeyboard(parent: KTableWidget) {
-        val lines = listOf("qwertyuiop", "asdfghjkl", "zxcvbnm")
+        val lines = listOf("qwertyuiopå", "asdfghjkløæ", "zxcvbnm")
         lines.forEachIndexed { i, line ->
             // row with 5 buttons
             parent.row()
@@ -254,7 +283,7 @@ class FirstScreen : KtxScreen {
     }
 
     private fun addLetter(letter: Char) {
-        if (value.length >= 6) return
+        if (value.length >= wordLength) return
         value += letter
         currentGuessRow.addLetter(letter)
     }

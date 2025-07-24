@@ -6,18 +6,16 @@ import com.badlogic.gdx.net.HttpStatus
 import kotlinx.serialization.json.Json
 import no.bekk.kordle.shared.dto.GjettOrdRequest
 import no.bekk.kordle.shared.dto.GjettResponse
+import no.bekk.kordle.shared.dto.OppgaveResponse
 
 // Callback-based approach
 inline fun <reified T, reified R> executeRequest(
-    method: String,
-    path: String,
-    body: T,
+    request: Net.HttpRequest,
     crossinline onSuccess: (R) -> Unit,
     crossinline onError: (String) -> Unit
 ) {
-    val httpRequest = generateHttpRequest(method, path, body)
 
-    Gdx.net.sendHttpRequest(httpRequest, object : Net.HttpResponseListener {
+    Gdx.net.sendHttpRequest(request, object : Net.HttpResponseListener {
         override fun handleHttpResponse(httpResponse: Net.HttpResponse) {
             val statusCode = httpResponse.status.statusCode
             val responseBody = httpResponse.resultAsString
@@ -51,20 +49,50 @@ inline fun <reified T> generateHttpRequest(
 ): Net.HttpRequest {
     return Net.HttpRequest(method).apply {
         this.url = "http://localhost:8080$path"
-        this.content = Json.encodeToString(body)
+        if (body != null) {
+            this.content = Json.encodeToString(body)
+        }
         // Set content type for JSON
         this.setHeader("Content-Type", "application/json")
     }
+}
+
+fun generateHttpRequest(
+    method: String,
+    path: String,
+): Net.HttpRequest {
+    return Net.HttpRequest(method).apply {
+        this.url = "http://localhost:8080$path"
+        // Set content type for JSON
+        this.setHeader("Content-Type", "application/json")
+    }
+}
+
+fun getTilfeldigOppgave(
+    onSuccess: (OppgaveResponse) -> Unit,
+) {
+    val request = generateHttpRequest("GET", "/hentTilfeldigOppgave")
+
+    executeRequest<Unit, OppgaveResponse>(
+        request,
+        onSuccess = { response ->
+            onSuccess(response)
+        },
+        onError = { error ->
+            println("Error occurred: $error")
+            // Handle error here
+        }
+    )
 }
 
 fun gjettOrd(
     gjettOrdRequest: GjettOrdRequest,
     onSuccess: (GjettResponse) -> Unit
 ) {
+    val request = generateHttpRequest("POST", "/gjettOrd", gjettOrdRequest)
+
     val response = executeRequest<GjettOrdRequest, GjettResponse>(
-        method = "POST",
-        path = "/gjettOrd",
-        body = gjettOrdRequest,
+        request,
         onSuccess = { response ->
             onSuccess(response)
         },
