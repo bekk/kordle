@@ -1,11 +1,14 @@
 package no.bekk.kordle
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
+import com.badlogic.gdx.scenes.scene2d.InputEvent
+import com.badlogic.gdx.scenes.scene2d.InputListener
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.utils.ScreenUtils
@@ -70,7 +73,55 @@ class FirstScreen : KtxScreen {
         }
 
         stage.addActor(rootTable)
+
+        stage.addListener(createKeyboardListener())
         currentGuessRow.setIsActive()
+    }
+
+    fun createKeyboardListener(): InputListener {
+        return object : InputListener() {
+            override fun keyDown(event: InputEvent?, keycode: Int): Boolean {
+                when (keycode) {
+                    Input.Keys.BACKSPACE -> {
+                        removeLetter()
+                    }
+
+                    Input.Keys.ENTER -> {
+                        submit()
+                    }
+
+                    else -> {
+                        val letter = Input.Keys.toString(keycode)
+                        if (letter.length == 1 && letter[0] in 'A'..'Z') {
+                            addLetter(letter[0].lowercaseChar())
+                        }
+                    }
+                }
+
+                return super.keyDown(event, keycode)
+            }
+        }
+    }
+
+    private fun submit() {
+        val gjettOrdRequest = GjettOrdRequest(
+            oppgaveId = 1,
+            ordGjett = value.uppercase()
+        )
+        gjettOrd(gjettOrdRequest) { response ->
+            currentGuessRow.markGuess(response)
+            if (currentGuessIndex < maxGuesses - 1) {
+                currentGuessIndex++
+            }
+            value = ""
+        }
+    }
+
+    fun removeLetter() {
+        if (value.isNotEmpty()) {
+            value = value.dropLast(1)
+            currentGuessRow.removeLetter()
+        }
     }
 
     private fun setupKeyboard(parent: KTableWidget) {
@@ -84,17 +135,7 @@ class FirstScreen : KtxScreen {
                     button {
                         label("✓", "small")
                         onClick {
-                            val gjettOrdRequest = GjettOrdRequest(
-                                oppgaveId = 1,
-                                ordGjett = value.uppercase()
-                            )
-                            gjettOrd(gjettOrdRequest) { response ->
-                                currentGuessRow.markGuess(response)
-                                if (currentGuessIndex < maxGuesses - 1) {
-                                    currentGuessIndex++
-                                }
-                                value = ""
-                            }
+                            submit()
                         }
                     }
                 }
@@ -114,10 +155,7 @@ class FirstScreen : KtxScreen {
                     button {
                         label("⌫", "small")
                         onClick {
-                            if (value.isNotEmpty()) {
-                                value = value.dropLast(1)
-                                currentGuessRow.removeLetter()
-                            }
+                            removeLetter()
                         }
                     }
                 }
