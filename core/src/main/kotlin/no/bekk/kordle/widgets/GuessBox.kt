@@ -31,7 +31,7 @@ class GuessBox(parent: KTableWidget, val index: Int) {
     var value: Char? = null
         set(value) {
             field = value
-            label.setText(value?.toString() ?: "")
+            label.setText(value?.uppercase() ?: "")
         }
 
     fun setIsActive() {
