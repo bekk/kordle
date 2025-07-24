@@ -44,46 +44,8 @@ class FirstScreen : KtxScreen {
     private val currentGuessRow: GuessRow
         get() = guessRows[currentGuessIndex]
 
-    fun initiateAssetManager(): AssetManager {
-        val assetManager = AssetManager()
-        // Calling registerFreeTypeFontLoaders is necessary in order to load TTF/OTF files:
-        assetManager.registerFreeTypeFontLoaders()
-        return assetManager
-    }
-
     init {
-        val assetManager = initiateAssetManager()
-
-        assetManager.load<BitmapFont>(
-            "sourceSans24.ttf",
-            BitmapFont::class.java,
-            freeTypeFontParameters("fonts/source-sans-3/SourceSans3-ExtraBold.ttf") {
-                size = 24
-                color = Color.WHITE
-            }
-        )
-        assetManager.load<BitmapFont>(
-            "sourceSans14.ttf",
-            BitmapFont::class.java,
-            freeTypeFontParameters("fonts/source-sans-3/SourceSans3-Bold.ttf") {
-                size = 14
-                color = Color.WHITE
-            }
-        )
-        assetManager.finishLoading()
-        Scene2DSkin.defaultSkin = Skin("skins/default/uiskin.json".toInternalFile()).apply {
-            add("sourceSans24", assetManager["sourceSans24.ttf", BitmapFont::class.java])
-            add("sourceSans14", assetManager["sourceSans14.ttf", BitmapFont::class.java])
-            label("small") {
-                font = getFont("sourceSans14")
-                fontColor = Color.WHITE
-            }
-            label("large") {
-                font = getFont("sourceSans24")
-                fontColor = Color.WHITE
-            }
-        }
-
+        Scene2DSkin.defaultSkin = createSkin()
         val rootTable = scene2d.table {
             setFillParent(true)
         }
@@ -154,6 +116,48 @@ class FirstScreen : KtxScreen {
                 }
             }
         }
+    }
+
+    private fun createSkin(): Skin {
+        val assetManager = initiateAssetManager()
+
+        assetManager.load(
+            "sourceSans24.ttf",
+            BitmapFont::class.java,
+            freeTypeFontParameters("fonts/source-sans-3/SourceSans3-ExtraBold.ttf") {
+                size = 24
+                color = Color.WHITE
+            }
+        )
+        assetManager.load(
+            "sourceSans14.ttf",
+            BitmapFont::class.java,
+            freeTypeFontParameters("fonts/source-sans-3/SourceSans3-Bold.ttf") {
+                size = 14
+                color = Color.WHITE
+            }
+        )
+        assetManager.finishLoading()
+        
+        return Skin("skins/default/uiskin.json".toInternalFile()).apply {
+            add("sourceSans24", assetManager["sourceSans24.ttf", BitmapFont::class.java])
+            add("sourceSans14", assetManager["sourceSans14.ttf", BitmapFont::class.java])
+            label("small") {
+                font = getFont("sourceSans14")
+                fontColor = Color.WHITE
+            }
+            label("large") {
+                font = getFont("sourceSans24")
+                fontColor = Color.WHITE
+            }
+        }
+    }
+
+    fun initiateAssetManager(): AssetManager {
+        val assetManager = AssetManager()
+        // Calling registerFreeTypeFontLoaders is necessary in order to load TTF/OTF files:
+        assetManager.registerFreeTypeFontLoaders()
+        return assetManager
     }
 
     private fun addLetter(letter: Char) {
