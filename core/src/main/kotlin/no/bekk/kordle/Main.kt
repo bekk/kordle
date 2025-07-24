@@ -1,6 +1,9 @@
 package no.bekk.kordle
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.assets.AssetManager
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
@@ -12,7 +15,10 @@ import ktx.app.KtxScreen
 import ktx.assets.disposeSafely
 import ktx.assets.toInternalFile
 import ktx.async.KtxAsync
+import ktx.freetype.freeTypeFontParameters
+import ktx.freetype.registerFreeTypeFontLoaders
 import ktx.scene2d.*
+import ktx.style.label
 import no.bekk.kordle.requests.gjettOrd
 import no.bekk.kordle.shared.dto.GjettOrdRequest
 import no.bekk.kordle.widgets.GuessRow
@@ -38,8 +44,46 @@ class FirstScreen : KtxScreen {
     private val currentGuessRow: GuessRow
         get() = guessRows[currentGuessIndex]
 
+    fun initiateAssetManager(): AssetManager {
+        val assetManager = AssetManager()
+        // Calling registerFreeTypeFontLoaders is necessary in order to load TTF/OTF files:
+        assetManager.registerFreeTypeFontLoaders()
+        return assetManager
+    }
+
     init {
-        Scene2DSkin.defaultSkin = Skin("skins/default/uiskin.json".toInternalFile())
+        val assetManager = initiateAssetManager()
+
+        assetManager.load<BitmapFont>(
+            "sourceSans24.ttf",
+            BitmapFont::class.java,
+            freeTypeFontParameters("fonts/source-sans-3/SourceSans3-ExtraBold.ttf") {
+                size = 24
+                color = Color.WHITE
+            }
+        )
+        assetManager.load<BitmapFont>(
+            "sourceSans14.ttf",
+            BitmapFont::class.java,
+            freeTypeFontParameters("fonts/source-sans-3/SourceSans3-Bold.ttf") {
+                size = 14
+                color = Color.WHITE
+            }
+        )
+        assetManager.finishLoading()
+        Scene2DSkin.defaultSkin = Skin("skins/default/uiskin.json".toInternalFile()).apply {
+            add("sourceSans24", assetManager["sourceSans24.ttf", BitmapFont::class.java])
+            add("sourceSans14", assetManager["sourceSans14.ttf", BitmapFont::class.java])
+            label("small") {
+                font = getFont("sourceSans14")
+                fontColor = Color.WHITE
+            }
+            label("large") {
+                font = getFont("sourceSans24")
+                fontColor = Color.WHITE
+            }
+        }
+
         val rootTable = scene2d.table {
             setFillParent(true)
         }
@@ -87,7 +131,7 @@ class FirstScreen : KtxScreen {
                 }
                 line.forEach { letter ->
                     button {
-                        label(letter.uppercase())
+                        label(letter.uppercase(), "small")
                         onClick {
                             addLetter(letter)
                         }

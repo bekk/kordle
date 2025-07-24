@@ -22,7 +22,7 @@ class GuessBox(parent: KTableWidget, val index: Int) {
         setOrigin(Align.center)
         background = whiteBackground.tint(BekkColors.Vann1)
 
-        label = label("") {
+        label = label("", "large") {
             setAlignment(Align.center)
             color = BekkColors.Dag
         }
