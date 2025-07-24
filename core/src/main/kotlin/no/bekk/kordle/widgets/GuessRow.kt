@@ -44,6 +44,11 @@ class GuessRow(parent: KTableWidget, private val length: Int) {
         }
     }
 
+    fun reset() {
+        value = ""
+        boxes.forEach { it.reset() }
+    }
+
     fun setIsActive() {
         boxes.forEach { it.setIsActive() }
     }

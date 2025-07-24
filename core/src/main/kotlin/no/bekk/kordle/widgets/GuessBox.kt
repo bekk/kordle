@@ -38,6 +38,11 @@ class GuessBox(parent: KTableWidget, val index: Int) {
         container.background = whiteBackground.tint(BekkColors.Vann1)
     }
 
+    fun reset() {
+        value = null
+        container.background = whiteBackground.tint(BekkColors.Vann2)
+    }
+
     fun setStatus(status: LetterGuessStatus) {
         val color = when (status) {
             LetterGuessStatus.NOT_GUESSED -> return

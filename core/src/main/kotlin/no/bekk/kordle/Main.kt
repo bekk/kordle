@@ -95,6 +95,10 @@ class FirstScreen : KtxScreen {
                         submit()
                     }
 
+                    Input.Keys.ESCAPE -> {
+                        reset()
+                    }
+
                     else -> {
                         val letter = Input.Keys.toString(keycode)
                         if (letter.length == 1 && letter[0] in 'A'..'Z') {
@@ -120,6 +124,12 @@ class FirstScreen : KtxScreen {
             }
             value = ""
         }
+    }
+
+    private fun reset() {
+        value = ""
+        currentGuessIndex = 0
+        guessRows.forEach { it.reset() } // Reset all guesses
     }
 
     fun removeLetter() {
