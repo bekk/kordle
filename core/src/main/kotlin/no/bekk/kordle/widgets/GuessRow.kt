@@ -32,12 +32,20 @@ class GuessRow(parent: KTableWidget, private val length: Int) {
         guessResult.alleBokstavtreff.forEachIndexed { i, result ->
             if (i >= boxes.size) return@forEachIndexed
             boxes[i].setStatus(
-                when {
-                    !result.erBokstavenIOrdet -> LetterGuessStatus.NOT_IN_WORD
-                    result.erBokstavenPaaRettsted -> LetterGuessStatus.CORRECT_POSITION
-                    else -> LetterGuessStatus.WRONG_POSITION
-                }
+                LetterGuessStatus.fromResponse(result)
             )
         }
+        (guessResult.alleBokstavtreff.size..boxes.size - 1).forEach { i ->
+            boxes[i].setStatus(LetterGuessStatus.NOT_IN_WORD)
+        }
+    }
+
+    fun reset() {
+        value = ""
+        boxes.forEach { it.reset() }
+    }
+
+    fun setIsActive() {
+        boxes.forEach { it.setIsActive() }
     }
 }
