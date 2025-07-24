@@ -40,4 +40,8 @@ class GuessRow(parent: KTableWidget, private val length: Int) {
             )
         }
     }
+
+    fun setIsActive() {
+        boxes.forEach { it.setIsActive() }
+    }
 }

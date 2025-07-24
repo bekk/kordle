@@ -20,7 +20,7 @@ class GuessBox(parent: KTableWidget, val index: Int) {
         isTransform = true
         setSize(40f, 40f)
         setOrigin(Align.center)
-        background = whiteBackground.tint(BekkColors.Vann1)
+        background = whiteBackground.tint(BekkColors.Vann2)
 
         label = label("", "large") {
             setAlignment(Align.center)
@@ -33,6 +33,10 @@ class GuessBox(parent: KTableWidget, val index: Int) {
             field = value
             label.setText(value?.toString() ?: "")
         }
+
+    fun setIsActive() {
+        container.background = whiteBackground.tint(BekkColors.Vann1)
+    }
 
     fun setStatus(status: LetterGuessStatus) {
         val color = when (status) {

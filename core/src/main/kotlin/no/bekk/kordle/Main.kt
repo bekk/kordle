@@ -39,7 +39,12 @@ class FirstScreen : KtxScreen {
 
     private var value = ""
     private val maxGuesses = 6
-    private var currentGuessIndex = 0
+    private var currentGuessIndex: Int = 0
+        set(value) {
+            field = value
+            currentGuessRow.setIsActive()
+        }
+
     private val guessRows: MutableList<GuessRow>
 
     private val currentGuessRow: GuessRow
@@ -65,6 +70,7 @@ class FirstScreen : KtxScreen {
         }
 
         stage.addActor(rootTable)
+        currentGuessRow.setIsActive()
     }
 
     private fun setupKeyboard(parent: KTableWidget) {
