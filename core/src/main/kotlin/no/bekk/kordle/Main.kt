@@ -13,7 +13,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.utils.ScreenUtils
 import com.badlogic.gdx.utils.viewport.ScreenViewport
-import ktx.actors.onClick
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
 import ktx.assets.disposeSafely
@@ -27,6 +26,7 @@ import no.bekk.kordle.requests.getTilfeldigOppgave
 import no.bekk.kordle.requests.gjettOrd
 import no.bekk.kordle.shared.dto.GjettOrdRequest
 import no.bekk.kordle.widgets.GuessRow
+import no.bekk.kordle.widgets.OnScreenKeyboard
 
 class Main : KtxGame<KtxScreen>() {
     override fun create() {
@@ -54,9 +54,8 @@ class FirstScreen : KtxScreen {
     private val currentGuessRow: GuessRow
         get() = guessRows[currentGuessIndex]
 
-    private val buttonByCharacter = mutableMapOf<Char, KButton>()
-    private val bestGuessByCharacter = mutableMapOf<Char, LetterGuessStatus>()
     private val guessTable: KTableWidget
+    private val keyboard: OnScreenKeyboard
 
     private var oppgaveId = -1
     private var wordLength = 6
@@ -95,10 +94,10 @@ class FirstScreen : KtxScreen {
         }
         buildGuessRows()
         rootTable.row()
-        rootTable.table {
-            setupKeyboard(this)
+        val keyboardTable = rootTable.table {
             it.fillX().expandX()
         }
+        keyboard = OnScreenKeyboard(keyboardTable, this)
 
         stage.addActor(rootTable)
 
@@ -144,22 +143,7 @@ class FirstScreen : KtxScreen {
     }
 
 
-    private fun updateBestGuess(letter: Char, guessStatus: LetterGuessStatus) {
-        val currentBestStatus = bestGuessByCharacter.getOrDefault(letter, LetterGuessStatus.NOT_GUESSED)
-        if (guessStatus > currentBestStatus) {
-            bestGuessByCharacter[letter] = guessStatus
-            buttonByCharacter[letter]?.apply {
-                color = when (guessStatus) {
-                    LetterGuessStatus.NOT_IN_WORD -> BekkColors.Natt
-                    LetterGuessStatus.WRONG_POSITION -> BekkColors.Ild1
-                    LetterGuessStatus.CORRECT_POSITION -> BekkColors.Jord1
-                    else -> BekkColors.Vann1
-                }
-            }
-        }
-    }
-
-    private fun submit() {
+    fun submit() {
         if (oppgaveId == -1) return
         val gjettOrdRequest = GjettOrdRequest(
             oppgaveId = oppgaveId,
@@ -168,7 +152,7 @@ class FirstScreen : KtxScreen {
         gjettOrd(gjettOrdRequest) { response ->
             currentGuessRow.markGuess(response)
             response.alleBokstavtreff.forEach { result ->
-                updateBestGuess(result.bokstavGjettet.lowercaseChar(), LetterGuessStatus.fromResponse(result))
+                keyboard.updateBestGuess(result.bokstavGjettet.lowercaseChar(), LetterGuessStatus.fromResponse(result))
             }
             if (currentGuessIndex < maxGuesses - 1) {
                 currentGuessIndex++
@@ -177,14 +161,11 @@ class FirstScreen : KtxScreen {
         }
     }
 
-    private fun reset() {
+    fun reset() {
         value = ""
         currentGuessIndex = 0
         guessRows.forEach { it.reset() } // Reset all guesses
-        bestGuessByCharacter.clear() // Clear the best guesses
-        buttonByCharacter.forEach { (_, button) ->
-            button.color = BekkColors.Vann1 // Reset button colors
-        }
+        keyboard.reset()
     }
 
     fun removeLetter() {
@@ -194,50 +175,6 @@ class FirstScreen : KtxScreen {
         }
     }
 
-    private fun setupKeyboard(parent: KTableWidget) {
-        val lines = listOf("qwertyuiopå", "asdfghjkløæ", "zxcvbnm")
-        lines.forEachIndexed { i, line ->
-            // row with 5 buttons
-            parent.row()
-            parent.table {
-                if (i == lines.size - 1) {
-                    // Add a spacer for the last row to align with the delete button
-                    button {
-                        label("✓", "small")
-                        color = BekkColors.Vann1
-                        onClick {
-                            submit()
-                        }
-                        it.width(40f)
-                    }
-                }
-                line.forEach { letter ->
-                    val b = button {
-                        label(letter.uppercase(), "small")
-                        color = BekkColors.Vann1
-                        onClick {
-                            addLetter(letter)
-                        }
-                        it
-                            .width(24f).height(40f)
-                            .pad(2f)
-                    }
-                    buttonByCharacter[letter] = b
-                }
-                if (i == lines.size - 1) {
-                    button {
-                        label("⌫", "small")
-                        color = BekkColors.Vann1
-
-                        onClick {
-                            removeLetter()
-                        }
-                        it.width(40f)
-                    }
-                }
-            }
-        }
-    }
 
     private fun createSkin(): Skin {
         val assetManager = initiateAssetManager()
@@ -282,7 +219,7 @@ class FirstScreen : KtxScreen {
         return assetManager
     }
 
-    private fun addLetter(letter: Char) {
+    fun addLetter(letter: Char) {
         if (value.length >= wordLength) return
         value += letter
         currentGuessRow.addLetter(letter)
@@ -302,3 +239,4 @@ class FirstScreen : KtxScreen {
         batch.disposeSafely()
     }
 }
+
