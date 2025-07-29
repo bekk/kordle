@@ -66,14 +66,27 @@ class OppgaveService(
         oppgave: Oppgave,
         ordGjettet: String
     ): List<BokstavTreff> {
-        val ordIOppgave = oppgave.ord.lowercase()
-        return ordGjettet.lowercase().mapIndexed { index, bokstav ->
+        val ordIOppgave: MutableList<Char?> = oppgave.ord.lowercase().map { it }.toMutableList()
+        val treff = ordGjettet.lowercase().mapIndexed { index, bokstav ->
+            val hit = ordIOppgave[index] == bokstav
+            if (hit) {
+                ordIOppgave[index] = null // Fjerner bokstaven fra ordet for å unngå dobbelttelling
+            }
             BokstavTreff(
                 plassISekvensen = index,
-                bokstavGjettet = bokstav.toString(),
-                erBokstavenIOrdet = ordIOppgave.contains(bokstav),
-                erBokstavenPaaRettsted = ordIOppgave[index] == bokstav
+                bokstavGjettet = bokstav,
+                erBokstavenIOrdet = hit,
+                erBokstavenPaaRettsted = hit
             )
-        }.sortedBy { it.plassISekvensen }
+        }
+        treff.forEachIndexed { index, treff ->
+            if (treff.erBokstavenPaaRettsted) return@forEachIndexed
+            val hitIndex = ordIOppgave.indexOfFirst { it == treff.bokstavGjettet }
+            if (hitIndex != -1) {
+                treff.erBokstavenIOrdet = true
+                ordIOppgave[hitIndex] = null
+            }
+        }
+        return treff
     }
 }

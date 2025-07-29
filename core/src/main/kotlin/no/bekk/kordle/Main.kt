@@ -168,7 +168,7 @@ class FirstScreen : KtxScreen {
         gjettOrd(gjettOrdRequest) { response ->
             currentGuessRow.markGuess(response)
             response.alleBokstavtreff.forEach { result ->
-                updateBestGuess(result.bokstavGjettet[0].lowercaseChar(), LetterGuessStatus.fromResponse(result))
+                updateBestGuess(result.bokstavGjettet.lowercaseChar(), LetterGuessStatus.fromResponse(result))
             }
             if (currentGuessIndex < maxGuesses - 1) {
                 currentGuessIndex++
