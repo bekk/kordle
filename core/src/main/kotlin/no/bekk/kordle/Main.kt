@@ -165,9 +165,9 @@ class FirstScreen : KtxScreen {
 
     fun reset() {
         value = ""
-        currentGuessIndex = 0
         guessRows.forEach { it.reset() } // Reset all guesses
         keyboard.reset()
+        currentGuessIndex = 0
     }
 
     fun removeLetter() {
