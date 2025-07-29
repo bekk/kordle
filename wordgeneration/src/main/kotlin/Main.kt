@@ -1,13 +1,14 @@
 import valuetypes.Malform
 import valuetypes.ResultType
+import java.io.File
 
 fun main() {
     val henter = OrdHenterDeluxe3000()
     (4..6).forEach { n ->
-        val fasitOrd = henter.getFasitOrdForLength(n)
-        println("Fasit ord for lengde $n: ${fasitOrd.size} ord")
         val gjettOrd = henter.getGjettOrdForLength(n)
-        println("Gjette-ord for lengde $n: ${gjettOrd.size} ord")
+        val file = File("server/src/main/resources/gjettord-$n.txt")
+        file.createNewFile()
+        file.writeText(gjettOrd.joinToString("\n"))
     }
 }
 
@@ -45,11 +46,14 @@ class OrdHenterDeluxe3000 {
             count = count,
             malform = Malform.Bokmal
         )
-        return results.values.flatMap { it.map { entry -> entry.lemma } }.toSet()
+        return results.values
+            .flatMap { it.map { entry -> entry.lemma } }
+            .filter(::isValidOrd)
+            .toSet()
     }
+}
 
-    val validLetters = ('a'..'z') + ('A'..'Z') + "æøåÆØÅ"
-    fun isValidOrd(word: String): Boolean {
-        return word.all { it in validLetters }
-    }
+val validLetters = ('a'..'z') + ('A'..'Z') + "æøåÆØÅ".toList()
+fun isValidOrd(word: String): Boolean {
+    return word.all { it in validLetters }
 }
