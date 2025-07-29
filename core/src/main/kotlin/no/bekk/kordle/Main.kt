@@ -75,6 +75,8 @@ class FirstScreen : KtxScreen {
         getTilfeldigOppgave {
             oppgaveId = it.id
             wordLength = it.lengde
+            // reset for å farge øverste rad
+            currentGuessIndex = 0
         }
 
         Scene2DSkin.defaultSkin = createSkin()
@@ -174,7 +176,6 @@ class FirstScreen : KtxScreen {
             currentGuessRow.removeLetter()
         }
     }
-
 
     private fun createSkin(): Skin {
         val assetManager = initiateAssetManager()
