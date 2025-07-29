@@ -49,8 +49,8 @@ class OppgaveService(
     fun gjettOrd(gjettOrdRequest: GjettOrdRequest): GjettResponse {
         val ordGjett = gjettOrdRequest.ordGjett
         val oppgaveGjettetPaa = oppgaveRepository.hentOppgave(gjettOrdRequest.oppgaveId)
-        if (ordGjett.length > oppgaveGjettetPaa.ord.length) {
-            throw OrdetHarUgyldigLengdeException("Gjettet '${ordGjett}' er for langt for oppgaven. Oppgaven har lengde ${oppgaveGjettetPaa.ord.length} tegn.")
+        if (ordGjett.length != oppgaveGjettetPaa.ord.length) {
+            throw OrdetHarUgyldigLengdeException("Gjettet '${ordGjett}' er feil lengde for oppgaven. Oppgaven har lengde ${oppgaveGjettetPaa.ord.length} tegn.")
         }
         val bokstavTreff = sjekkBokstavTreff(
             oppgave = oppgaveGjettetPaa,
