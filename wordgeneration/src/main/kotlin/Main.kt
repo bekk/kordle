@@ -1,56 +1,55 @@
-import org.springframework.web.client.RestClient
-import org.springframework.web.client.body
+import valuetypes.Malform
+import valuetypes.ResultType
 
 fun main() {
-    val suggestClient = SuggestClient()
-    suggestClient.suggest()
+    val henter = OrdHenterDeluxe3000()
+    (4..6).forEach { n ->
+        val fasitOrd = henter.getFasitOrdForLength(n)
+        println("Fasit ord for lengde $n: ${fasitOrd.size} ord")
+        val gjettOrd = henter.getGjettOrdForLength(n)
+        println("Gjette-ord for lengde $n: ${gjettOrd.size} ord")
+    }
 }
 
-class SuggestClient {
-
-    //private val json = Json { ignoreUnknownKeys = true }
-    private val restClient = RestClient.builder().baseUrl("https://ord.uib.no/api").build()
-
-    fun suggest() {
-        val responseBody = restClient.get()
-            .uri("/suggest?q=____&n=100&dict=bm&include=eis&dform=int")
-            .retrieve()
-
-        println(responseBody.body<String>())
-        //val parsed = json.decodeFromString<RawSuggestResponse>(responseBody)
+class OrdHenterDeluxe3000 {
+    private val client = SuggestClient()
+    fun getFasitOrdForLength(
+        length: Int,
+        /* antall ord å hente - merk at dette gjøres alfabetisk.
+         Hvis man vil ha et begrenset antall, kan det være bedre å hente ut så mange som overhodet mulig,
+         og så gjøre .shuffled().take(n) */
+        count: Int = 1_000_000
+    ): Set<String> {
+        val results = client.suggest(
+            // finner ord med lengde n
+            "_".repeat(length),
+            count = count,
+            malform = Malform.Bokmal,
+        )
+        return results[ResultType.Exact]
+            ?.map { word -> word.lemma }
+            ?.filter(::isValidOrd)
+            ?.toSet()
+            ?: emptySet()
     }
 
-    /* fun suggest(
-         query: String,
-         wordClass: String? = null,
-         count: Int = 10,
-         dicts: List<Dict> = listOf(Dict.Bokmaal, Dict.Nynorsk),
-         include: Set<IncludeFlag> = setOf(
-             IncludeFlag.Exact,
-             IncludeFlag.Freetext,
-             IncludeFlag.Inflect,
-             IncludeFlag.Similar
-         ),
-         dform: Int? = null
-     ): Map<ResultType, List<SuggestEntry>> {
-         val responseBody = restClient.get()
-             .uri { uriBuilder ->
-                 uriBuilder
-                     .path("/suggest")
-                     .queryParam("q", query)
-                     .queryParam("n", count)
-                     .queryParam("dict", dicts.joinToString(",") { it.code })
-                     .queryParam("include", include.joinToString("") { it.code.toString() })
-                     .apply {
-                         if (wordClass != null) queryParam("wc", wordClass)
-                         if (dform != null) queryParam("dform", dform)
-                     }
-                     .build()
-             }
-             .retrieve()
-             .body(String::class.java)
+    fun getGjettOrdForLength(
+        length: Int,     /* antall ord å hente - merk at dette gjøres alfabetisk.
+     Hvis man vil ha et begrenset antall, kan det være bedre å hente ut så mange som overhodet mulig,
+     og så gjøre .shuffle().take(n) */
+        count: Int = 1_000_000
+    ): Set<String> {
+        val results = client.suggest(
+            // finner ord med lengde n
+            "_".repeat(length),
+            count = count,
+            malform = Malform.Bokmal
+        )
+        return results.values.flatMap { it.map { entry -> entry.lemma } }.toSet()
+    }
 
-         val parsed = json.decodeFromString<RawSuggestResponse>(responseBody!!)
-         return parsed.parseEntries()
-     }*/
+    val validLetters = ('a'..'z') + ('A'..'Z') + "æøåÆØÅ"
+    fun isValidOrd(word: String): Boolean {
+        return word.all { it in validLetters }
+    }
 }
