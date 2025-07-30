@@ -1,12 +1,13 @@
 package no.bekk.kordle.server.controller
 
+import no.bekk.kordle.server.exceptions.GjettetErIkkeIOrdlistaException
 import no.bekk.kordle.server.exceptions.GjettetHarUgyldigLengdeException
 import no.bekk.kordle.server.exceptions.OrdetEksistererAlleredeIDatabasenException
 import no.bekk.kordle.server.exceptions.OrdetHarUgyldigLengdeException
 import no.bekk.kordle.server.service.OppgaveService
+import no.bekk.kordle.server.service.OrdValidatorService
 import no.bekk.kordle.shared.dto.GjettOrdRequest
 import no.bekk.kordle.shared.dto.LeggTilOrdRequest
-import no.bekk.kordle.shared.dto.Oppgave
 import no.bekk.kordle.shared.dto.OppgaveResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class OppgaveController(
     private val oppgaveService: OppgaveService,
+    private val ordValidatorService: OrdValidatorService
 ) {
 
     @GetMapping("/hello")
@@ -52,6 +54,9 @@ class OppgaveController(
     @PostMapping("/gjettOrd")
     fun gjettOrd(@RequestBody gjettOrdRequest: GjettOrdRequest): ResponseEntity<*> {
         try {
+            if (!ordValidatorService.isValid(gjettOrdRequest.ordGjett)) {
+                throw GjettetErIkkeIOrdlistaException("Ordet '${gjettOrdRequest.ordGjett}' er ikke i ordlista.")
+            }
             val bokstavTreff = oppgaveService.gjettOrd(gjettOrdRequest)
             return ResponseEntity.ok().body(bokstavTreff)
 

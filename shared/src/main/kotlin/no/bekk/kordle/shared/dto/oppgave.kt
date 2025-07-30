@@ -12,7 +12,7 @@ data class Oppgave(
     val id: Int,
     val ord: String,
     val lengde: Int,
-){
+) {
     fun tilOppgaveResponse(): OppgaveResponse {
         return OppgaveResponse(
             id = this.id,
@@ -42,7 +42,7 @@ data class GjettResponse(
 @Serializable
 data class BokstavTreff(
     val plassISekvensen: Int,
-    val bokstavGjettet: String,
-    val erBokstavenIOrdet: Boolean,
+    val bokstavGjettet: Char,
+    var erBokstavenIOrdet: Boolean,
     val erBokstavenPaaRettsted: Boolean
 )
