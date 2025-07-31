@@ -2,25 +2,30 @@ package no.bekk.kordle
 
 import no.bekk.kordle.requests.gjettOrd
 import no.bekk.kordle.shared.dto.GjettOrdRequest
+import no.bekk.kordle.shared.dto.OppgaveResponse
 
 class KordleController(private val ui: KordleUI) {
     var value = ""
-    var oppgaveId = -1
+    var currentOppgave: OppgaveResponse? = null
+        set(value) {
+            field = value
+            if (value != null) {
+                ui.processReset()
+            }
+        }
+    val wordLength: Int?
+        get() = currentOppgave?.lengde
     val maxGuesses = 6
     var currentGuessIndex: Int = 0
         set(value) {
             field = value
             ui.processSetActiveRow(value)
         }
-    var wordLength = 6
-        set(value) {
-            field = value
-        }
 
     fun submit() {
-        if (oppgaveId == -1) return
+        val oppgave = currentOppgave ?: return
         val gjettOrdRequest = GjettOrdRequest(
-            oppgaveId = oppgaveId,
+            oppgaveId = oppgave.id,
             ordGjett = value.uppercase()
         )
         gjettOrd(gjettOrdRequest) { response ->
@@ -46,7 +51,8 @@ class KordleController(private val ui: KordleUI) {
     }
 
     fun addLetter(letter: Char) {
-        if (value.length >= wordLength) return
+        val oppgave = currentOppgave ?: return
+        if (value.length >= oppgave.lengde) return
         value += letter
         ui.processAddLetter(letter)
     }

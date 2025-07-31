@@ -1,10 +1,7 @@
 package no.bekk.kordle
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.scenes.scene2d.InputEvent
-import com.badlogic.gdx.scenes.scene2d.InputListener
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.ScreenUtils
 import com.badlogic.gdx.utils.viewport.ScreenViewport
@@ -51,16 +48,13 @@ class FirstScreen : KtxScreen, KordleUI {
     private fun buildGuessRows() {
         guessTable.clearChildren()
         guessRows = (0 until controller.maxGuesses).map {
-            GuessRow(guessTable, controller.wordLength)
+            GuessRow(guessTable, controller.wordLength ?: 6)
         }.toMutableList()
     }
 
     init {
         getTilfeldigOppgave {
-            controller.oppgaveId = it.id
-            controller.wordLength = it.lengde
-            // reset for å farge øverste rad
-            controller.currentGuessIndex = 0
+            controller.currentOppgave = it
         }
 
         Scene2DSkin.defaultSkin = createSkin(this)
@@ -87,46 +81,10 @@ class FirstScreen : KtxScreen, KordleUI {
 
         stage.addActor(rootTable)
 
-        stage.addListener(createKeyboardListener())
+        stage.addListener(createKeyboardListener(controller))
         currentGuessRow.setIsActive()
     }
 
-    fun createKeyboardListener(): InputListener {
-        return object : InputListener() {
-            override fun keyDown(event: InputEvent?, keycode: Int): Boolean {
-                when (keycode) {
-                    Input.Keys.BACKSPACE -> {
-                        controller.removeLetter()
-                    }
-
-                    Input.Keys.ENTER -> {
-                        controller.submit()
-                    }
-
-                    Input.Keys.ESCAPE -> {
-                        controller.reset()
-                    }
-
-                    else -> {
-                        val letter = Input.Keys.toString(keycode)
-                        val norwegianLetter = mapOf('\'' to 'æ', ';' to 'ø', '[' to 'å')
-                        if (letter.length == 1) {
-                            val char = letter[0]
-                            if (char in norwegianLetter) {
-                                controller.addLetter(norwegianLetter[char] ?: char)
-                                return super.keyDown(event, keycode)
-                            } else if (char in 'A'..'Z') {
-                                controller.addLetter(char.lowercaseChar())
-                                return super.keyDown(event, keycode)
-                            }
-                        }
-                    }
-                }
-
-                return super.keyDown(event, keycode)
-            }
-        }
-    }
 
     override fun processReset() {
         guessRows.forEach { it.reset() } // Reset all guesses
