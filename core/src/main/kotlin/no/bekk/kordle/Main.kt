@@ -2,26 +2,17 @@ package no.bekk.kordle
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.assets.AssetManager
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.utils.ScreenUtils
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
 import ktx.assets.disposeSafely
-import ktx.assets.toInternalFile
 import ktx.async.KtxAsync
-import ktx.freetype.freeTypeFontParameters
-import ktx.freetype.registerFreeTypeFontLoaders
 import ktx.scene2d.*
-import ktx.style.label
 import no.bekk.kordle.requests.getTilfeldigOppgave
 import no.bekk.kordle.requests.gjettOrd
 import no.bekk.kordle.shared.dto.GjettOrdRequest
@@ -79,7 +70,7 @@ class FirstScreen : KtxScreen {
             currentGuessIndex = 0
         }
 
-        Scene2DSkin.defaultSkin = createSkin()
+        Scene2DSkin.defaultSkin = createSkin(this)
         val rootTable = scene2d.table {
             setFillParent(true)
         }
@@ -177,48 +168,6 @@ class FirstScreen : KtxScreen {
         }
     }
 
-    private fun createSkin(): Skin {
-        val assetManager = initiateAssetManager()
-
-        assetManager.load(
-            "sourceSans30.ttf",
-            BitmapFont::class.java,
-            freeTypeFontParameters("fonts/source-sans-3/SourceSans3-ExtraBold.ttf") {
-                size = 30
-                color = Color.WHITE
-            }
-        )
-        assetManager.load(
-            "sourceSans24.ttf",
-            BitmapFont::class.java,
-            freeTypeFontParameters("fonts/source-sans-3/SourceSans3-Bold.ttf") {
-                size = 24
-                color = Color.WHITE
-                characters = FreeTypeFontGenerator.DEFAULT_CHARS + "⌫✓"
-            }
-        )
-        assetManager.finishLoading()
-
-        return Skin("skins/new/KordleNew.json".toInternalFile()).apply {
-            add("sourceSans30", assetManager["sourceSans30.ttf", BitmapFont::class.java])
-            add("sourceSans24", assetManager["sourceSans24.ttf", BitmapFont::class.java])
-            label("small") {
-                font = getFont("sourceSans24")
-                fontColor = Color.WHITE
-            }
-            label("large") {
-                font = getFont("sourceSans30")
-                fontColor = Color.WHITE
-            }
-        }
-    }
-
-    fun initiateAssetManager(): AssetManager {
-        val assetManager = AssetManager()
-        // Calling registerFreeTypeFontLoaders is necessary in order to load TTF/OTF files:
-        assetManager.registerFreeTypeFontLoaders()
-        return assetManager
-    }
 
     fun addLetter(letter: Char) {
         if (value.length >= wordLength) return
