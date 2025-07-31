@@ -14,8 +14,7 @@ import ktx.assets.disposeSafely
 import ktx.async.KtxAsync
 import ktx.scene2d.*
 import no.bekk.kordle.requests.getTilfeldigOppgave
-import no.bekk.kordle.requests.gjettOrd
-import no.bekk.kordle.shared.dto.GjettOrdRequest
+import no.bekk.kordle.shared.dto.GjettResponse
 import no.bekk.kordle.widgets.GuessRow
 import no.bekk.kordle.widgets.OnScreenKeyboard
 
@@ -28,46 +27,40 @@ class Main : KtxGame<KtxScreen>() {
     }
 }
 
-class FirstScreen : KtxScreen {
+interface KordleUI {
+    fun processReset()
+    fun processAddLetter(letter: Char)
+    fun processRemoveLetter()
+    fun processGjett(gjett: GjettResponse)
+    fun processSetActiveRow(rowIndex: Int)
+}
+
+class FirstScreen : KtxScreen, KordleUI {
     private val batch = SpriteBatch()
     private val stage = Stage(ScreenViewport()).also { Gdx.input.inputProcessor = it }
 
-    private var value = ""
-    private val maxGuesses = 6
-    private var currentGuessIndex: Int = 0
-        set(value) {
-            field = value
-            currentGuessRow.setIsActive()
-        }
-
+    private val controller = KordleController(this)
     private var guessRows: MutableList<GuessRow> = mutableListOf()
 
     private val currentGuessRow: GuessRow
-        get() = guessRows[currentGuessIndex]
+        get() = guessRows[controller.currentGuessIndex]
 
     private val guessTable: KTableWidget
     private val keyboard: OnScreenKeyboard
 
-    private var oppgaveId = -1
-    private var wordLength = 6
-        set(value) {
-            field = value
-            buildGuessRows()
-        }// Default word length, can be updated from the server
-
     private fun buildGuessRows() {
         guessTable.clearChildren()
-        guessRows = (0 until maxGuesses).map {
-            GuessRow(guessTable, wordLength)
+        guessRows = (0 until controller.maxGuesses).map {
+            GuessRow(guessTable, controller.wordLength)
         }.toMutableList()
     }
 
     init {
         getTilfeldigOppgave {
-            oppgaveId = it.id
-            wordLength = it.lengde
+            controller.oppgaveId = it.id
+            controller.wordLength = it.lengde
             // reset for å farge øverste rad
-            currentGuessIndex = 0
+            controller.currentGuessIndex = 0
         }
 
         Scene2DSkin.defaultSkin = createSkin(this)
@@ -90,7 +83,7 @@ class FirstScreen : KtxScreen {
         val keyboardTable = rootTable.table {
             it.fillX().expandX()
         }
-        keyboard = OnScreenKeyboard(keyboardTable, this)
+        keyboard = OnScreenKeyboard(keyboardTable, controller)
 
         stage.addActor(rootTable)
 
@@ -103,15 +96,15 @@ class FirstScreen : KtxScreen {
             override fun keyDown(event: InputEvent?, keycode: Int): Boolean {
                 when (keycode) {
                     Input.Keys.BACKSPACE -> {
-                        removeLetter()
+                        controller.removeLetter()
                     }
 
                     Input.Keys.ENTER -> {
-                        submit()
+                        controller.submit()
                     }
 
                     Input.Keys.ESCAPE -> {
-                        reset()
+                        controller.reset()
                     }
 
                     else -> {
@@ -120,10 +113,10 @@ class FirstScreen : KtxScreen {
                         if (letter.length == 1) {
                             val char = letter[0]
                             if (char in norwegianLetter) {
-                                addLetter(norwegianLetter[char] ?: char)
+                                controller.addLetter(norwegianLetter[char] ?: char)
                                 return super.keyDown(event, keycode)
                             } else if (char in 'A'..'Z') {
-                                addLetter(char.lowercaseChar())
+                                controller.addLetter(char.lowercaseChar())
                                 return super.keyDown(event, keycode)
                             }
                         }
@@ -135,44 +128,29 @@ class FirstScreen : KtxScreen {
         }
     }
 
-
-    fun submit() {
-        if (oppgaveId == -1) return
-        val gjettOrdRequest = GjettOrdRequest(
-            oppgaveId = oppgaveId,
-            ordGjett = value.uppercase()
-        )
-        gjettOrd(gjettOrdRequest) { response ->
-            currentGuessRow.markGuess(response)
-            response.alleBokstavtreff.forEach { result ->
-                keyboard.updateBestGuess(result.bokstavGjettet.lowercaseChar(), LetterGuessStatus.fromResponse(result))
-            }
-            if (currentGuessIndex < maxGuesses - 1) {
-                currentGuessIndex++
-            }
-            value = ""
-        }
-    }
-
-    fun reset() {
-        value = ""
+    override fun processReset() {
         guessRows.forEach { it.reset() } // Reset all guesses
         keyboard.reset()
-        currentGuessIndex = 0
+        currentGuessRow.setIsActive()
     }
 
-    fun removeLetter() {
-        if (value.isNotEmpty()) {
-            value = value.dropLast(1)
-            currentGuessRow.removeLetter()
+    override fun processAddLetter(letter: Char) {
+        currentGuessRow.addLetter(letter)
+    }
+
+    override fun processRemoveLetter() {
+        currentGuessRow.removeLetter()
+    }
+
+    override fun processGjett(gjett: GjettResponse) {
+        currentGuessRow.markGuess(gjett)
+        gjett.alleBokstavtreff.forEach { result ->
+            keyboard.updateBestGuess(result.bokstavGjettet.lowercaseChar(), LetterGuessStatus.fromResponse(result))
         }
     }
 
-
-    fun addLetter(letter: Char) {
-        if (value.length >= wordLength) return
-        value += letter
-        currentGuessRow.addLetter(letter)
+    override fun processSetActiveRow(rowIndex: Int) {
+        currentGuessRow.setIsActive()
     }
 
     override fun render(delta: Float) {
@@ -189,4 +167,3 @@ class FirstScreen : KtxScreen {
         batch.disposeSafely()
     }
 }
-
