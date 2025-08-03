@@ -30,9 +30,16 @@ class KordleController(private val ui: KordleUI) {
         )
         gjettOrd(gjettOrdRequest) { response ->
             ui.processGjett(response)
+            val won = response.alleBokstavtreff.all { it.erBokstavenPaaRettsted }
+            if (won) {
+                ui.processGameOver(true)
+            }
             if (currentGuessIndex < maxGuesses - 1) {
                 currentGuessIndex++
+            } else if (!won) {
+                ui.processGameOver(false);
             }
+
             value = ""
         }
     }

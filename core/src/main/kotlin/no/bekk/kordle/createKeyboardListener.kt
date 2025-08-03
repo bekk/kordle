@@ -4,20 +4,27 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
 
-fun createKeyboardListener(controller: KordleController): InputListener {
+interface KeyboardReceiver {
+    fun onLetterPressed(letter: Char)
+    fun onBackspacePressed()
+    fun onEnterPressed()
+    fun onEscapePressed()
+}
+
+fun createKeyboardListener(receiver: KeyboardReceiver): InputListener {
     return object : InputListener() {
         override fun keyDown(event: InputEvent?, keycode: Int): Boolean {
             when (keycode) {
                 Input.Keys.BACKSPACE -> {
-                    controller.removeLetter()
+                    receiver.onBackspacePressed()
                 }
 
                 Input.Keys.ENTER -> {
-                    controller.submit()
+                    receiver.onEnterPressed()
                 }
 
                 Input.Keys.ESCAPE -> {
-                    controller.reset()
+                    receiver.onEscapePressed()
                 }
 
                 else -> {
@@ -26,10 +33,10 @@ fun createKeyboardListener(controller: KordleController): InputListener {
                     if (letter.length == 1) {
                         val char = letter[0]
                         if (char in norwegianLetter) {
-                            controller.addLetter(norwegianLetter[char] ?: char)
+                            receiver.onLetterPressed(norwegianLetter[char]!!)
                             return super.keyDown(event, keycode)
                         } else if (char in 'A'..'Z') {
-                            controller.addLetter(char.lowercaseChar())
+                            receiver.onLetterPressed(char.lowercaseChar())
                             return super.keyDown(event, keycode)
                         }
                     }

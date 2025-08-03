@@ -12,6 +12,7 @@ import ktx.async.KtxAsync
 import ktx.scene2d.*
 import no.bekk.kordle.requests.getTilfeldigOppgave
 import no.bekk.kordle.shared.dto.GjettResponse
+import no.bekk.kordle.widgets.GameOver
 import no.bekk.kordle.widgets.GuessRow
 import no.bekk.kordle.widgets.OnScreenKeyboard
 
@@ -30,6 +31,7 @@ interface KordleUI {
     fun processRemoveLetter()
     fun processGjett(gjett: GjettResponse)
     fun processSetActiveRow(rowIndex: Int)
+    fun processGameOver(won: Boolean)
 }
 
 class FirstScreen : KtxScreen, KordleUI {
@@ -42,11 +44,13 @@ class FirstScreen : KtxScreen, KordleUI {
     private val currentGuessRow: GuessRow
         get() = guessRows[controller.currentGuessIndex]
 
+    private var isPaused = false
     private val guessTable: KTableWidget
     private val keyboard: OnScreenKeyboard
+    private val gameOver: GameOver
 
     private fun buildGuessRows() {
-        guessTable.clearChildren()
+        guessTable?.clear()
         guessRows = (0 until controller.maxGuesses).map {
             GuessRow(guessTable, controller.wordLength ?: 6)
         }.toMutableList()
@@ -80,14 +84,35 @@ class FirstScreen : KtxScreen, KordleUI {
         keyboard = OnScreenKeyboard(keyboardTable, controller)
 
         stage.addActor(rootTable)
+        gameOver = GameOver(stage, controller)
 
-        stage.addListener(createKeyboardListener(controller))
+
+        stage.addListener(createKeyboardListener(object : KeyboardReceiver {
+            override fun onLetterPressed(letter: Char) {
+                if (!isPaused) controller.addLetter(letter)
+            }
+
+            override fun onBackspacePressed() {
+                if (!isPaused)
+                    controller.removeLetter()
+            }
+
+            override fun onEnterPressed() {
+                if (!isPaused)
+                    controller.submit()
+            }
+
+            override fun onEscapePressed() {
+                isPaused = !isPaused
+                gameOver.toggle()
+            }
+        }))
         currentGuessRow.setIsActive()
     }
 
 
     override fun processReset() {
-        guessRows.forEach { it.reset() } // Reset all guesses
+        buildGuessRows()
         keyboard.reset()
         currentGuessRow.setIsActive()
     }
@@ -111,6 +136,10 @@ class FirstScreen : KtxScreen, KordleUI {
         currentGuessRow.setIsActive()
     }
 
+    override fun processGameOver(won: Boolean) {
+        gameOver.show(won)
+    }
+
     override fun render(delta: Float) {
         ScreenUtils.clear(BekkColors.Dag)
         stage.act(delta)
@@ -125,3 +154,4 @@ class FirstScreen : KtxScreen, KordleUI {
         batch.disposeSafely()
     }
 }
+
