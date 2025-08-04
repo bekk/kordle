@@ -13,3 +13,17 @@ data class User(
 data class CreateUserRequest(
     val username: String,
 )
+
+@Serializable
+data class UserOppgaveResult(
+    val userId: Int,
+    val oppgaveId: Int,
+    val success: Boolean,
+    val attemptCount: Int,
+)
+
+@Serializable
+data class StatsForUser(
+    val userId: Int,
+    val amountOfOppgaverSolvedByGjett: Map<Int, Int>
+)

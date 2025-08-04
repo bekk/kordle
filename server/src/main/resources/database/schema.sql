@@ -20,7 +20,7 @@ CREATE INDEX IF NOT EXISTS
 ON KordleUser (Username);
 
 CREATE TABLE IF NOT EXISTS
-    UserOppgave (
+    UserOppgaveResult (
         UserId BIGINT NOT NULL,
         OppgaveId BIGINT NOT NULL,
         Success BOOLEAN NOT NULL,

@@ -137,3 +137,37 @@ fun createUser(
         }
     )
 }
+
+fun registerResult(
+    userOppgaveResult: UserOppgaveResult,
+    onSuccess: (StatsForUser) -> Unit
+) {
+    val request = generateHttpRequest("POST", "/result", userOppgaveResult)
+
+    executeRequest<StatsForUser>(
+        request,
+        onSuccess = { response ->
+            onSuccess(response)
+        },
+        onError = { error ->
+            println("Error occurred: $error")
+        }
+    )
+}
+
+fun getUserStats(
+    userId: Int,
+    onSuccess: (StatsForUser) -> Unit
+) {
+    val request = generateHttpRequest("GET", "/users/$userId/stats")
+
+    executeRequest<StatsForUser>(
+        request,
+        onSuccess = { response ->
+            onSuccess(response)
+        },
+        onError = { error ->
+            println("Error occurred: $error")
+        }
+    )
+}

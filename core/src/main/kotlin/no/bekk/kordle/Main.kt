@@ -10,12 +10,11 @@ import ktx.app.KtxScreen
 import ktx.assets.disposeSafely
 import ktx.async.KtxAsync
 import ktx.scene2d.*
-import no.bekk.kordle.requests.createUser
-import no.bekk.kordle.requests.getTilfeldigOppgave
-import no.bekk.kordle.requests.getUser
+import no.bekk.kordle.requests.*
 import no.bekk.kordle.shared.dto.CreateUserRequest
 import no.bekk.kordle.shared.dto.GjettResponse
 import no.bekk.kordle.shared.dto.User
+import no.bekk.kordle.shared.dto.UserOppgaveResult
 import no.bekk.kordle.widgets.GameOver
 import no.bekk.kordle.widgets.GuessRow
 import no.bekk.kordle.widgets.OnScreenKeyboard
@@ -64,7 +63,9 @@ class FirstScreen : KtxScreen, KordleUI {
 
     init {
         // if you change username, stats effectively reset
-        fetchOrCreateUser("localKordleUser") { user = it }
+        fetchOrCreateUser("localKordleUser") {
+            user = it
+        }
         getTilfeldigOppgave {
             controller.currentOppgave = it
         }
@@ -111,8 +112,11 @@ class FirstScreen : KtxScreen, KordleUI {
             }
 
             override fun onEscapePressed() {
-                isPaused = !isPaused
-                gameOver.toggle()
+                if (user != null) {
+                    getUserStats(user!!.id) { stats -> gameOver.setStats(stats) }
+                }
+
+                isPaused = gameOver.toggle()
             }
         }))
         currentGuessRow.setIsActive()
@@ -145,6 +149,18 @@ class FirstScreen : KtxScreen, KordleUI {
     }
 
     override fun processGameOver(won: Boolean) {
+        if (user != null) {
+            registerResult(
+                UserOppgaveResult(
+                    user!!.id,
+                    controller.currentOppgave!!.id,
+                    won,
+                    controller.currentGuessIndex + 1
+                )
+            ) { stats ->
+                gameOver.setStats(stats)
+            }
+        }
         gameOver.show(won)
     }
 

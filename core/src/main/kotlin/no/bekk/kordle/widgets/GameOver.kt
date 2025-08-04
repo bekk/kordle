@@ -9,11 +9,13 @@ import ktx.scene2d.*
 import no.bekk.kordle.BekkColors
 import no.bekk.kordle.KordleController
 import no.bekk.kordle.requests.getTilfeldigOppgave
+import no.bekk.kordle.shared.dto.StatsForUser
 
 class GameOver(private val parent: Stage, private val controller: KordleController) {
     private val label: Label
+    private val stats: Stats
     private val table: KTableWidget = scene2d.table {
-        background = (skin.getDrawable("white") as TextureRegionDrawable).tint(BekkColors.Natt.copy(alpha = 0.8f))
+        background = (skin.getDrawable("white") as TextureRegionDrawable).tint(BekkColors.Natt.copy(alpha = 0.9f))
         label = label("Game over", "large") {
             color = BekkColors.Dag
         }
@@ -29,6 +31,11 @@ class GameOver(private val parent: Stage, private val controller: KordleControll
                 }
             }
         }
+        row()
+        table {
+        }.also {
+            stats = Stats(it, controller.maxGuesses)
+        }
         setFillParent(true)
     }
 
@@ -37,9 +44,15 @@ class GameOver(private val parent: Stage, private val controller: KordleControll
         parent.addActor(table)
     }
 
-    fun toggle() {
+    fun toggle(): Boolean {
         this.label.setText("Pauset")
-        table.isVisible = !table.isVisible
+        val isVisible = !table.isVisible
+        table.isVisible = isVisible
+        return isVisible
+    }
+
+    fun setStats(stats: StatsForUser?) {
+        this.stats.stats = stats
     }
 
     fun show(won: Boolean) {
@@ -58,3 +71,4 @@ class GameOver(private val parent: Stage, private val controller: KordleControll
         table.isVisible = false
     }
 }
+
