@@ -89,18 +89,19 @@ fun getTilfeldigOppgave(
 
 fun gjettOrd(
     gjettOrdRequest: GjettOrdRequest,
-    onSuccess: (GjettResponse) -> Unit
+    onSuccess: (GjettResponse) -> Unit,
+    onError: (String) -> Unit
 ) {
     val request = generateHttpRequest("POST", "/gjettOrd", gjettOrdRequest)
 
-    val response = executeRequest<GjettResponse>(
+    executeRequest<GjettResponse>(
         request,
         onSuccess = { response ->
             onSuccess(response)
         },
         onError = { error ->
             println("Error occurred: $error")
-            // Handle error here
+            onError(error)
         }
     )
 }

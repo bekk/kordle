@@ -35,6 +35,7 @@ interface KordleUI {
     fun processAddLetter(letter: Char)
     fun processRemoveLetter()
     fun processGjett(gjett: GjettResponse)
+    fun processInvalidGjett(error: String)
     fun processSetActiveRow(rowIndex: Int)
     fun processGameOver(won: Boolean)
 }
@@ -150,6 +151,10 @@ class FirstScreen : KtxScreen, KordleUI {
         gjett.alleBokstavtreff.forEach { result ->
             keyboard.updateBestGuess(result.bokstavGjettet.lowercaseChar(), LetterGuessStatus.fromResponse(result))
         }
+    }
+
+    override fun processInvalidGjett(error: String) {
+        currentGuessRow.shake()
     }
 
     override fun processSetActiveRow(rowIndex: Int) {

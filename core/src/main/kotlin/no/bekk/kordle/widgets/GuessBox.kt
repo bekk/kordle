@@ -11,6 +11,7 @@ import ktx.scene2d.container
 import ktx.scene2d.label
 import no.bekk.kordle.BekkColors
 import no.bekk.kordle.LetterGuessStatus
+import no.bekk.kordle.actions.ShakeAction
 
 class GuessBox(parent: KTableWidget, val index: Int) {
     private val label: Label
@@ -28,6 +29,7 @@ class GuessBox(parent: KTableWidget, val index: Int) {
         }
 
     }
+    private var isShaking = false
     var value: Char? = null
         set(value) {
             field = value
@@ -41,6 +43,17 @@ class GuessBox(parent: KTableWidget, val index: Int) {
     fun reset() {
         value = null
         container.background = whiteBackground.tint(BekkColors.Vann2)
+    }
+
+    fun shake() {
+        if (isShaking) return
+        isShaking = true
+        container += sequence(
+            ShakeAction(amplitude = 20f),
+            run(Runnable {
+                isShaking = false
+            })
+        )
     }
 
     fun setStatus(status: LetterGuessStatus) {
