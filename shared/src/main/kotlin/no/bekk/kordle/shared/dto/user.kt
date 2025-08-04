@@ -25,5 +25,6 @@ data class UserOppgaveResult(
 @Serializable
 data class StatsForUser(
     val userId: Int,
+    val amountOfOppgaverFailed: Int,
     val amountOfOppgaverSolvedByGjett: Map<Int, Int>
 )

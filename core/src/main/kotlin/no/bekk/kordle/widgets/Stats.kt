@@ -43,5 +43,12 @@ class Stats(private val parent: KTableWidget, private val maxGuesses: Int) {
             }
             parent.row()
         }
+        parent.label("Feilet", "small") {
+            it.align(Align.left).padRight(32f)
+        }
+        parent.label("${stats?.amountOfOppgaverFailed} oppgaver", "small") {
+            it.align(Align.right)
+        }
+        parent.row()
     }
 }

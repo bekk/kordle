@@ -29,9 +29,12 @@ class UserService(val userRepository: UserRepository, val userOppgaveResultRepos
     }
 
     fun statsForUser(userId: Int): StatsForUser {
-        val oppgaveCountByAttemptCount = userOppgaveResultRepository.getUserById(userId)
+        val resultater = userOppgaveResultRepository.getUserById(userId)
+        val oppgaveCountByAttemptCount = resultater
+            .filter { it.success }
             .groupBy { it.attemptCount }
             .mapValues { it.value.size }
-        return StatsForUser(userId, oppgaveCountByAttemptCount)
+        val amountOfOppgaverFailed = resultater.count { !it.success }
+        return StatsForUser(userId, amountOfOppgaverFailed, oppgaveCountByAttemptCount)
     }
 }
