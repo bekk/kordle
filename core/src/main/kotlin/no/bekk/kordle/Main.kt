@@ -1,6 +1,7 @@
 package no.bekk.kordle
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.ScreenUtils
@@ -8,6 +9,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
 import ktx.assets.disposeSafely
+import ktx.assets.toInternalFile
 import ktx.async.KtxAsync
 import ktx.scene2d.*
 import no.bekk.kordle.requests.*
@@ -40,6 +42,7 @@ interface KordleUI {
 class FirstScreen : KtxScreen, KordleUI {
     private val batch = SpriteBatch()
     private val stage = Stage(ScreenViewport()).also { Gdx.input.inputProcessor = it }
+    private val kotlinLogo = Texture("kotlinLogo.png".toInternalFile())
 
     private val controller = KordleController(this)
     private var guessRows: MutableList<GuessRow> = mutableListOf()
@@ -74,9 +77,14 @@ class FirstScreen : KtxScreen, KordleUI {
         val rootTable = scene2d.table {
             setFillParent(true)
         }
-        rootTable.label("KORDLE", "large") {
-            color = BekkColors.Natt
-            it.spaceBottom(20f)
+        rootTable.table {
+            image(kotlinLogo) {
+                it.width(28f).height(28f)
+            }
+            label("ORDLE", "large") {
+                color = BekkColors.Natt
+                it.spaceBottom(20f)
+            }
         }
         rootTable.row()
         guessTable = rootTable.table {
