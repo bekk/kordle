@@ -10,8 +10,12 @@ import ktx.app.KtxScreen
 import ktx.assets.disposeSafely
 import ktx.async.KtxAsync
 import ktx.scene2d.*
+import no.bekk.kordle.requests.createUser
 import no.bekk.kordle.requests.getTilfeldigOppgave
+import no.bekk.kordle.requests.getUser
+import no.bekk.kordle.shared.dto.CreateUserRequest
 import no.bekk.kordle.shared.dto.GjettResponse
+import no.bekk.kordle.shared.dto.User
 import no.bekk.kordle.widgets.GameOver
 import no.bekk.kordle.widgets.GuessRow
 import no.bekk.kordle.widgets.OnScreenKeyboard
@@ -49,6 +53,8 @@ class FirstScreen : KtxScreen, KordleUI {
     private val keyboard: OnScreenKeyboard
     private val gameOver: GameOver
 
+    private var user: User? = null
+
     private fun buildGuessRows() {
         guessTable?.clear()
         guessRows = (0 until controller.maxGuesses).map {
@@ -57,6 +63,8 @@ class FirstScreen : KtxScreen, KordleUI {
     }
 
     init {
+        // if you change username, stats effectively reset
+        fetchOrCreateUser("localKordleUser") { user = it }
         getTilfeldigOppgave {
             controller.currentOppgave = it
         }
@@ -152,6 +160,13 @@ class FirstScreen : KtxScreen, KordleUI {
 
     override fun dispose() {
         batch.disposeSafely()
+    }
+}
+
+fun fetchOrCreateUser(username: String, callback: (User) -> Unit) {
+    getUser(username) { user ->
+        if (user != null) callback(user)
+        else createUser(CreateUserRequest(username), callback)
     }
 }
 
