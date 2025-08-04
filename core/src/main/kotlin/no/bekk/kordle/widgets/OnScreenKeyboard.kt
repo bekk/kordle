@@ -3,10 +3,10 @@ package no.bekk.kordle.widgets
 import ktx.actors.onClick
 import ktx.scene2d.*
 import no.bekk.kordle.BekkColors
-import no.bekk.kordle.FirstScreen
+import no.bekk.kordle.KordleController
 import no.bekk.kordle.LetterGuessStatus
 
-class OnScreenKeyboard(private val parent: KTableWidget, private val controller: FirstScreen) {
+class OnScreenKeyboard(private val parent: KTableWidget, private val controller: KordleController) {
     private val buttonByCharacter = mutableMapOf<Char, KButton>()
     private val bestGuessByCharacter = mutableMapOf<Char, LetterGuessStatus>()
 
