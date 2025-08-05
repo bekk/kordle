@@ -17,6 +17,10 @@ class OppgaveService(
         return alleOppgaver.random().tilOppgaveResponse()
     }
 
+    fun hentAlleOppgaver(): List<OppgaveResponse> {
+        return oppgaveRepository.hentAlleOppgaver().map { it.tilOppgaveResponse() }
+    }
+
     // TODO: Vurder om sjekken for eksisterende ord bør gjøres i databasen istedenfor. Kanskje en oppgave i seg selv?
     fun leggTilOrd(ordSomSkalLeggesTil: String): OppgaveResponse {
         val erOrdetGyldigLengde = ordSomSkalLeggesTil.length in 4..6
@@ -41,7 +45,7 @@ class OppgaveService(
             lengde = ordSomSkalLeggesTil.length
         )
         return OppgaveResponse(
-            id = idTilNyopprettetOppgave,
+            oppgaveId = idTilNyopprettetOppgave,
             lengde = ordSomSkalLeggesTil.length
         )
     }

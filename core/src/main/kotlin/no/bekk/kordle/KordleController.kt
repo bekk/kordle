@@ -25,7 +25,7 @@ class KordleController(private val ui: KordleUI) {
     fun submit() {
         val oppgave = currentOppgave ?: return
         val gjettOrdRequest = GjettOrdRequest(
-            oppgaveId = oppgave.id,
+            oppgaveId = oppgave.oppgaveId,
             ordGjett = value.uppercase()
         )
         gjettOrd(gjettOrdRequest, { response ->

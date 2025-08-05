@@ -166,7 +166,7 @@ class FirstScreen : KtxScreen, KordleUI {
             registerResult(
                 UserOppgaveResult(
                     user!!.id,
-                    controller.currentOppgave!!.id,
+                    controller.currentOppgave!!.oppgaveId,
                     won,
                     controller.currentGuessIndex + 1
                 )

@@ -3,6 +3,15 @@
 Hei og velkommen til Kordle!
 Kordle er et spill inspirert [wordle](https://www.nytimes.com/games/wordle/index.html), hvor en gjetter på et tilfeldig valgt ord.
 
+## Spillregler
+1. Du har 6 forsøk på å gjette et ord.
+2. Hvert ord er mellom 4 og 6 bokstaver langt.
+3. Hver gang du gjetter et ord, vil du få tilbakemelding på hvilke bokstaver som er riktige og hvor de er plassert. Dette indikeres ved
+    - Grønn: Bokstaven er riktig og på riktig plass.
+    - Gul: Bokstaven er riktig, men er ikke på riktig plass.
+    - Sort: Bokstaven er ikke i ordet.
+4. Du kan ikke gjette ord som ikke er i ordlisten.
+
 ## Teknologier
 
 ### Intellij
@@ -80,16 +89,6 @@ curl -X GET http://localhost:8080/health
 
 Hvis du får en respons som sier `Kordle server is running`, så er serveren oppe og kjører som den skal!
 Om alt har gått knirkefritt så skal du nå være klar til å ta fatt på oppgavene! 🚀 Hvis ikke så rop ut, så kommer vi og hjelper! 🏃💨
-
-
-## Spillregler
-1. Du har 6 forsøk på å gjette et ord.
-2. Hvert ord er mellom 4 og 6 bokstaver langt.
-3. Hver gang du gjetter et ord, vil du få tilbakemelding på hvilke bokstaver som er riktige og hvor de er plassert. Dette indikeres ved
-    - Grønn: Bokstaven er riktig og på riktig plass.
-    - Gul: Bokstaven er riktig, men er ikke på riktig plass.
-    - Sort: Bokstaven er ikke i ordet.
-4. Du kan ikke gjette ord som ikke er i ordlisten.
 
 ## Om prosjektet
 Prosjektet er delt inn i flere moduler, hver med sitt eget formål:

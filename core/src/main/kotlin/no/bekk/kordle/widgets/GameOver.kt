@@ -6,7 +6,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import ktx.actors.onClick
 import ktx.graphics.copy
 import ktx.scene2d.*
-import ktx.style.skin
 import no.bekk.kordle.BekkColors
 import no.bekk.kordle.KordleController
 import no.bekk.kordle.requests.getFasitord
@@ -67,7 +66,7 @@ class GameOver(private val parent: Stage, private val controller: KordleControll
     }
 
     fun show(won: Boolean) {
-        setFasitOrdLabel(controller.currentOppgave!!.id)
+        setFasitOrdLabel(controller.currentOppgave!!.oppgaveId)
         this.label.setText(
             if (won) {
                 "Du vant!"

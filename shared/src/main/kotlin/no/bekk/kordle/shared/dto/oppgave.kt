@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class OppgaveResponse(
-    val id: Int,
+    val oppgaveId: Int,
     val lengde: Int,
 )
 
@@ -15,7 +15,7 @@ data class Oppgave(
 ) {
     fun tilOppgaveResponse(): OppgaveResponse {
         return OppgaveResponse(
-            id = this.id,
+            oppgaveId = this.id,
             lengde = this.lengde
         )
     }

@@ -29,6 +29,12 @@ class OppgaveController(
         return ResponseEntity.ok().body("Kordle server is running")
     }
 
+    @GetMapping("/hentAlleOppgaver")
+    fun hentAlleOppgaver(): ResponseEntity<*> {
+        val alleOpppgaver = oppgaveService.hentAlleOppgaver()
+        return ResponseEntity.ok().body(alleOpppgaver)
+    }
+
     @GetMapping("/hentTilfeldigOppgave")
     fun hentTilfeldigOppgave(): OppgaveResponse {
         return oppgaveService.hentTilfeldigOppgave()

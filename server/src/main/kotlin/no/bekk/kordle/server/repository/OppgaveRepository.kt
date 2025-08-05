@@ -12,9 +12,12 @@ import org.springframework.jdbc.support.KeyHolder
 class OppgaveRepository(
     private val jdbcTemplate: NamedParameterJdbcTemplate,
 ) {
-
-
-
+    /**
+     * Henter alle oppgaver fra databasen. Funksjonen kjører en SQL-spørring som henter alle rader fra OPPGAVE-tabellen
+     * og bruker DataClassRowMapper for å mappe resultatet til en liste av Oppgave-objekter.
+     * Hvis det ikke finnes noen oppgaver i databasen, returneres en tom liste.
+     * @return En liste av alle Oppgave-objekter som finnes i databasen.
+     */
     fun hentAlleOppgaver(): List<Oppgave> {
         return jdbcTemplate.query(
             "SELECT * FROM OPPGAVE",
