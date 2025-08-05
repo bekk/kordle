@@ -12,9 +12,10 @@ class OppgaveService(
     val oppgaveRepository: OppgaveRepository
 ) {
 
-    fun hentTilfeldigOppgave(): OppgaveResponse {
+    fun hentTilfeldigOppgave(): Oppgave {
         val alleOppgaver = oppgaveRepository.hentAlleOppgaver()
-        return alleOppgaver.random().tilOppgaveResponse()
+        val tilfeldigOppgave = alleOppgaver.random()
+        return tilfeldigOppgave
     }
 
     fun hentAlleOppgaver(): List<OppgaveResponse> {

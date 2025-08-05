@@ -3,10 +3,10 @@ package no.bekk.kordle.server.repository
 import no.bekk.kordle.shared.dto.Oppgave
 import org.springframework.jdbc.core.DataClassRowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
-import org.springframework.stereotype.Repository
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.support.GeneratedKeyHolder
 import org.springframework.jdbc.support.KeyHolder
+import org.springframework.stereotype.Repository
 
 @Repository
 class OppgaveRepository(
@@ -16,11 +16,14 @@ class OppgaveRepository(
      * Henter alle oppgaver fra databasen. Funksjonen kjører en SQL-spørring som henter alle rader fra OPPGAVE-tabellen
      * og bruker DataClassRowMapper for å mappe resultatet til en liste av Oppgave-objekter.
      * Hvis det ikke finnes noen oppgaver i databasen, returneres en tom liste.
+     * Datamapperen 'DataClassRowMapper' brukes for å konvertere hver rad i resultatsettet til et Oppgave-objekt.
      * @return En liste av alle Oppgave-objekter som finnes i databasen.
      */
     fun hentAlleOppgaver(): List<Oppgave> {
         return jdbcTemplate.query(
-            "SELECT * FROM OPPGAVE",
+            // TODO: Legg inn SQL-spørring her
+            """
+                """.trimIndent(), // SELECT * FROM OPPGAVE
             DataClassRowMapper(Oppgave::class.java),
         )
     }
@@ -48,7 +51,7 @@ class OppgaveRepository(
         return (keyHolder.key as Long).toInt()
     }
 
-    fun eksistererOrdIDatabasen(ord:String): Int? {
+    fun eksistererOrdIDatabasen(ord: String): Int? {
         return jdbcTemplate.queryForObject(
             """SELECT CASE WHEN
                 |EXISTS(SELECT ord FROM OPPGAVE WHERE ord=:ord)
