@@ -12,7 +12,11 @@ import no.bekk.kordle.requests.getFasitord
 import no.bekk.kordle.requests.getTilfeldigOppgave
 import no.bekk.kordle.shared.dto.StatsForUser
 
-class GameOver(private val parent: Stage, private val controller: KordleController) {
+class GameOver(
+    private val parent: Stage,
+    private val controller: KordleController,
+    private val errorWidget: ErrorWidget
+) {
     private val label: Label
     private val stats: Stats
     private val fasitOrdLabel: Label
@@ -22,11 +26,11 @@ class GameOver(private val parent: Stage, private val controller: KordleControll
             color = BekkColors.Dag
         }
         row()
-        label("Ordet var:", "small"){
+        label("Ordet var:", "small") {
             color = BekkColors.Dag
         }
         row()
-        fasitOrdLabel =  label("", "small"){
+        fasitOrdLabel = label("", "small") {
             color = BekkColors.Dag
         }
         row()
@@ -34,11 +38,17 @@ class GameOver(private val parent: Stage, private val controller: KordleControll
             label("Ny oppgave", "small")
             color = BekkColors.Vann1
             onClick {
-                getTilfeldigOppgave { oppgaveResponse ->
-                    controller.currentOppgave = oppgaveResponse
-                    controller.reset()
-                    hide()
-                }
+                getTilfeldigOppgave(
+                    onSuccess = { oppgaveResponse ->
+                        controller.currentOppgave = oppgaveResponse
+                        controller.reset()
+                        hide()
+                        errorWidget.hide()
+                    },
+                    onFailure = {
+                        errorWidget.show()
+                    }
+                )
             }
         }
         row()

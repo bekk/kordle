@@ -17,6 +17,7 @@ import no.bekk.kordle.shared.dto.CreateUserRequest
 import no.bekk.kordle.shared.dto.GjettResponse
 import no.bekk.kordle.shared.dto.User
 import no.bekk.kordle.shared.dto.UserOppgaveResult
+import no.bekk.kordle.widgets.ErrorWidget
 import no.bekk.kordle.widgets.GameOver
 import no.bekk.kordle.widgets.GuessRow
 import no.bekk.kordle.widgets.OnScreenKeyboard
@@ -55,6 +56,7 @@ class FirstScreen : KtxScreen, KordleUI {
     private val guessTable: KTableWidget
     private val keyboard: OnScreenKeyboard
     private val gameOver: GameOver
+    private val errorWidget: ErrorWidget
 
     private var user: User? = null
 
@@ -66,15 +68,8 @@ class FirstScreen : KtxScreen, KordleUI {
     }
 
     init {
-        // if you change username, stats effectively reset
-        fetchOrCreateUser("localKordleUser") {
-            user = it
-        }
-        getTilfeldigOppgave {
-            controller.currentOppgave = it
-        }
-
         Scene2DSkin.defaultSkin = createSkin(this)
+
         val rootTable = scene2d.table {
             setFillParent(true)
         }
@@ -102,7 +97,18 @@ class FirstScreen : KtxScreen, KordleUI {
         keyboard = OnScreenKeyboard(keyboardTable, controller)
 
         stage.addActor(rootTable)
-        gameOver = GameOver(stage, controller)
+        errorWidget = ErrorWidget(stage, controller)
+        // if you change username, stats effectively reset
+        fetchOrCreateUser("localKordleUser") {
+            user = it
+        }
+        getTilfeldigOppgave(
+            onSuccess = { controller.currentOppgave = it; errorWidget.hide() },
+            onFailure = {
+                errorWidget.show()
+            }
+        )
+        gameOver = GameOver(stage, controller, errorWidget)
 
 
         stage.addListener(createKeyboardListener(object : KeyboardReceiver {

@@ -5,6 +5,9 @@ import com.badlogic.gdx.Net
 import com.badlogic.gdx.net.HttpStatus
 import kotlinx.serialization.json.Json
 import no.bekk.kordle.shared.dto.*
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 // Callback-based approach
 inline fun <reified R> executeRequest(
@@ -72,6 +75,7 @@ fun generateHttpRequest(
 
 fun getTilfeldigOppgave(
     onSuccess: (OppgaveResponse) -> Unit,
+    onFailure: (String) -> Unit
 ) {
     val request = generateHttpRequest("GET", "/hentTilfeldigOppgave")
 
@@ -81,8 +85,8 @@ fun getTilfeldigOppgave(
             onSuccess(response)
         },
         onError = { error ->
-            println("Error occurred: $error")
-            // Handle error here
+            println("[${getCurrentTime()}]: Klarte ikke å hente tilfeldig oppgave grunnet feilen: '$error'")
+            onFailure(error)
         }
     )
 }
@@ -118,7 +122,7 @@ fun getUser(
             onSuccess(response)
         },
         onError = { error ->
-            println("Error occurred: $error")
+            println("[${getCurrentTime()}]: Klarte ikke å hente ut bruker grunnet feilen: '$error'")
         }
     )
 }
@@ -134,7 +138,7 @@ fun createUser(
             onSuccess(response)
         },
         onError = { error ->
-            println("Error occurred: $error")
+            println("[${getCurrentTime()}]: Klarte ikke å lage en bruker grunnet feilen: '$error'")
         }
     )
 }
@@ -190,4 +194,11 @@ fun getFasitord(
             onFailure(error)
         }
     )
+}
+
+fun getCurrentTime(): String {
+    return DateTimeFormatter
+        .ofPattern("HH:mm:ss")
+        .withZone(ZoneId.of("Europe/Oslo"))
+        .format(Instant.now())
 }
