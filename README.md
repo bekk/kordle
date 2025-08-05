@@ -67,13 +67,19 @@ Dette skal se slik ut:
 
 3. Kjør opp spring-applikasjonen ved å velge `Backend` i dropdown-menyen og trykke på den grønne play-knappen. Dette vil da:
    1. Starte opp en Spring Boot-applikasjon som lytter på port 8080.
-   2. Starte opp vår H2-database og laste inn en liste med gyldige ord som kan brukes i spillet.
+   2. Starte opp vår H2-database på port `9090` og laste inn en liste med gyldige ord som kan brukes i spillet.
 
 4. Når serveren er oppe, kan en starte opp skrivebordsapplikasjonen ved å velge `Frontend` i dropdown-menyen og trykke på den grønne play-knappen. Dette vil da:
    1. Starte opp en LWJGL3-applikasjon som viser GUI-en for spillet.
    2. Koble til serveren som kjører på port 8080 for å hente ordlisten og sende gjetninger.
 
-Et voilà! Om alt har gått knirkefritt så skal du nå være klar til å ta fatt på oppgavene! 🚀 Hvis ikke så rop ut, så kommer vi og hjelper! 🏃💨
+5. Kjør kommandoen
+```bash
+curl -X GET http://localhost:8080/health
+```
+
+Hvis du får en respons som sier `Kordle server is running`, så er serveren oppe og kjører som den skal!
+Om alt har gått knirkefritt så skal du nå være klar til å ta fatt på oppgavene! 🚀 Hvis ikke så rop ut, så kommer vi og hjelper! 🏃💨
 
 
 ## Spillregler

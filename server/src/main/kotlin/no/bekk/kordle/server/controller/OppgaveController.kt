@@ -24,9 +24,9 @@ class OppgaveController(
     private val ordValidatorService: OrdValidatorService
 ) {
 
-    @GetMapping("/hello")
-    fun helloWorld(): String {
-        return "HELLO WORLD FROM OPPGAVE CONTROLLER"
+    @GetMapping("/health")
+    fun healthCheck(): ResponseEntity<String?> {
+        return ResponseEntity.ok().body("Kordle server is running")
     }
 
     @GetMapping("/hentTilfeldigOppgave")
