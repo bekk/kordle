@@ -46,3 +46,14 @@ data class BokstavTreff(
     var erBokstavenIOrdet: Boolean,
     val erBokstavenPaaRettsted: Boolean
 )
+
+@Serializable
+data class HentFasitRequest(
+    val oppgaveId: Int
+)
+
+
+@Serializable
+data class HentFasitResponse(
+    val fasitOrd: String
+)

@@ -1,5 +1,6 @@
 package no.bekk.kordle.server.service
 
+import no.bekk.kordle.server.exceptions.OppgavenEksistererIkkeIDatabasenException
 import no.bekk.kordle.server.exceptions.OrdetEksistererAlleredeIDatabasenException
 import no.bekk.kordle.server.exceptions.OrdetHarUgyldigLengdeException
 import no.bekk.kordle.server.repository.OppgaveRepository
@@ -49,6 +50,9 @@ class OppgaveService(
     fun gjettOrd(gjettOrdRequest: GjettOrdRequest): GjettResponse {
         val ordGjett = gjettOrdRequest.ordGjett
         val oppgaveGjettetPaa = oppgaveRepository.hentOppgave(gjettOrdRequest.oppgaveId)
+        if (oppgaveGjettetPaa == null) {
+            throw OppgavenEksistererIkkeIDatabasenException("Oppgaven med ID ${gjettOrdRequest.oppgaveId} finnes ikke.")
+        }
         if (ordGjett.length != oppgaveGjettetPaa.ord.length) {
             throw OrdetHarUgyldigLengdeException("Gjettet '${ordGjett}' er feil lengde for oppgaven. Oppgaven har lengde ${oppgaveGjettetPaa.ord.length} tegn.")
         }
@@ -62,7 +66,17 @@ class OppgaveService(
         )
     }
 
-    fun sjekkBokstavTreff(
+    fun hentFasitOrd(oppgaveId: Int): HentFasitResponse {
+        val oppgave = oppgaveRepository.hentOppgave(oppgaveId)
+        if (oppgave == null) {
+            throw OppgavenEksistererIkkeIDatabasenException("Oppgaven med ID $oppgaveId finnes ikke.")
+        }
+        return HentFasitResponse(
+            fasitOrd = oppgave.ord
+        )
+    }
+
+    private fun sjekkBokstavTreff(
         oppgave: Oppgave,
         ordGjettet: String
     ): List<BokstavTreff> {
