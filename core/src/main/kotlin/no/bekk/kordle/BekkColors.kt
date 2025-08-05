@@ -24,4 +24,6 @@ object BekkColors {
     val Luft1 = Color.valueOf("#CAC2B8")
     val Luft2 = Color.valueOf("#DBD5CE")
     val Luft3 = Color.valueOf("#EEEBE8")
+
+    val ErrorRod = Color.valueOf("#FF0000")
 }

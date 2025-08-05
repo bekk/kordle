@@ -20,3 +20,11 @@ Content-Type: application/json
   "oppgaveId": 1,
   "ordGjett": "test"
 }
+
+### Hent Fasit
+POST localhost:8080/hentFasit
+Content-Type: application/json
+
+{
+  "oppgaveId": 300
+}

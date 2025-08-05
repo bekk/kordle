@@ -2,11 +2,13 @@ package no.bekk.kordle.server.controller
 
 import no.bekk.kordle.server.exceptions.GjettetErIkkeIOrdlistaException
 import no.bekk.kordle.server.exceptions.GjettetHarUgyldigLengdeException
+import no.bekk.kordle.server.exceptions.OppgavenEksistererIkkeIDatabasenException
 import no.bekk.kordle.server.exceptions.OrdetEksistererAlleredeIDatabasenException
 import no.bekk.kordle.server.exceptions.OrdetHarUgyldigLengdeException
 import no.bekk.kordle.server.service.OppgaveService
 import no.bekk.kordle.server.service.OrdValidatorService
 import no.bekk.kordle.shared.dto.GjettOrdRequest
+import no.bekk.kordle.shared.dto.HentFasitRequest
 import no.bekk.kordle.shared.dto.LeggTilOrdRequest
 import no.bekk.kordle.shared.dto.OppgaveResponse
 import org.springframework.http.HttpStatus
@@ -63,6 +65,24 @@ class OppgaveController(
         } catch (exception: RuntimeException) {
             val statusKodeSomSkalReturneres = when (exception) {
                 is GjettetHarUgyldigLengdeException -> HttpStatus.BAD_REQUEST
+                is OppgavenEksistererIkkeIDatabasenException -> HttpStatus.BAD_REQUEST
+                else -> HttpStatus.INTERNAL_SERVER_ERROR
+            }
+            return ResponseEntity
+                .status(statusKodeSomSkalReturneres)
+                .body(exception.message)
+        }
+    }
+
+    @PostMapping("/hentFasit")
+    fun hentFasit(@RequestBody hentFasitRequest: HentFasitRequest): ResponseEntity<*> {
+        try {
+            val fasitOrd = oppgaveService.hentFasitOrd(hentFasitRequest.oppgaveId)
+            return ResponseEntity.ok().body(fasitOrd)
+
+        } catch (exception: RuntimeException) {
+            val statusKodeSomSkalReturneres = when (exception) {
+                is OppgavenEksistererIkkeIDatabasenException -> HttpStatus.BAD_REQUEST
                 else -> HttpStatus.INTERNAL_SERVER_ERROR
             }
             return ResponseEntity

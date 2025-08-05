@@ -172,3 +172,22 @@ fun getUserStats(
         }
     )
 }
+
+fun getFasitord(
+    oppgaveId: Int,
+    onSuccess: (HentFasitResponse) -> Unit,
+    onFailure: (String) -> Unit
+) {
+    val request = generateHttpRequest("POST", "/hentFasit", HentFasitRequest(oppgaveId))
+
+    executeRequest<HentFasitResponse>(
+        request,
+        onSuccess = { response ->
+            onSuccess(response)
+        },
+        onError = { error ->
+            println("Error occurred: $error")
+            onFailure(error)
+        }
+    )
+}

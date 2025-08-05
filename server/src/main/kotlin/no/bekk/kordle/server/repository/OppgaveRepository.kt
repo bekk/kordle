@@ -63,8 +63,8 @@ class OppgaveRepository(
         )
     }
 
-    fun hentOppgave(oppgaveId: Int): Oppgave {
-        return jdbcTemplate.queryForObject(
+    fun hentOppgave(oppgaveId: Int): Oppgave? {
+        return jdbcTemplate.query(
             """SELECT * FROM OPPGAVE
                 |WHERE ID = :id
             """.trimMargin(),
@@ -74,7 +74,7 @@ class OppgaveRepository(
                 )
             ),
             DataClassRowMapper(Oppgave::class.java)
-        )!!
+        ).firstOrNull()
     }
 
 }

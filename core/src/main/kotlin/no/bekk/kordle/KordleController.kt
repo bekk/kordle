@@ -46,6 +46,10 @@ class KordleController(private val ui: KordleUI) {
         })
     }
 
+    fun autoFail(){
+        ui.processGameOver(false)
+    }
+
     fun reset() {
         value = ""
         currentGuessIndex = 0
