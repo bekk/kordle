@@ -28,7 +28,7 @@ class KordleController(private val ui: KordleUI) {
             oppgaveId = oppgave.id,
             ordGjett = value.uppercase()
         )
-        gjettOrd(gjettOrdRequest) { response ->
+        gjettOrd(gjettOrdRequest, { response ->
             ui.processGjett(response)
             val won = response.alleBokstavtreff.all { it.erBokstavenPaaRettsted }
             if (won) {
@@ -41,7 +41,9 @@ class KordleController(private val ui: KordleUI) {
             }
 
             value = ""
-        }
+        }, {
+            ui.processInvalidGjett(it)
+        })
     }
 
     fun reset() {

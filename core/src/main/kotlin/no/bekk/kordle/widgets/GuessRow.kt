@@ -40,6 +40,10 @@ class GuessRow(private val parent: KTableWidget, private val length: Int) {
         }
     }
 
+    fun shake() {
+        boxes.forEach { it.shake() }
+    }
+
     fun reset() {
         value = ""
         boxes.forEach { it.reset() }

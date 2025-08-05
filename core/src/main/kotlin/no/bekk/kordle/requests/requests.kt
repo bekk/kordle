@@ -4,12 +4,10 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Net
 import com.badlogic.gdx.net.HttpStatus
 import kotlinx.serialization.json.Json
-import no.bekk.kordle.shared.dto.GjettOrdRequest
-import no.bekk.kordle.shared.dto.GjettResponse
-import no.bekk.kordle.shared.dto.OppgaveResponse
+import no.bekk.kordle.shared.dto.*
 
 // Callback-based approach
-inline fun <reified T, reified R> executeRequest(
+inline fun <reified R> executeRequest(
     request: Net.HttpRequest,
     crossinline onSuccess: (R) -> Unit,
     crossinline onError: (String) -> Unit
@@ -22,7 +20,11 @@ inline fun <reified T, reified R> executeRequest(
 
             if (statusCode == HttpStatus.SC_OK) {
                 try {
-                    val result = Json.decodeFromString<R>(responseBody)
+                    val result: R = when {
+                        responseBody.isBlank() && null is R -> null as R
+                        responseBody.isBlank() -> throw IllegalStateException("Expected non-empty response for type ${R::class.simpleName}")
+                        else -> Json.decodeFromString(responseBody)
+                    }
                     onSuccess(result)
                 } catch (e: Exception) {
                     onError("Failed to parse response: ${e.message}")
@@ -73,7 +75,7 @@ fun getTilfeldigOppgave(
 ) {
     val request = generateHttpRequest("GET", "/hentTilfeldigOppgave")
 
-    executeRequest<Unit, OppgaveResponse>(
+    executeRequest<OppgaveResponse>(
         request,
         onSuccess = { response ->
             onSuccess(response)
@@ -87,18 +89,86 @@ fun getTilfeldigOppgave(
 
 fun gjettOrd(
     gjettOrdRequest: GjettOrdRequest,
-    onSuccess: (GjettResponse) -> Unit
+    onSuccess: (GjettResponse) -> Unit,
+    onError: (String) -> Unit
 ) {
     val request = generateHttpRequest("POST", "/gjettOrd", gjettOrdRequest)
 
-    val response = executeRequest<GjettOrdRequest, GjettResponse>(
+    executeRequest<GjettResponse>(
         request,
         onSuccess = { response ->
             onSuccess(response)
         },
         onError = { error ->
             println("Error occurred: $error")
-            // Handle error here
+            onError(error)
+        }
+    )
+}
+
+fun getUser(
+    username: String,
+    onSuccess: (User?) -> Unit
+) {
+    val request = generateHttpRequest("GET", "/users?username=$username")
+
+    executeRequest<User?>(
+        request,
+        onSuccess = { response ->
+            onSuccess(response)
+        },
+        onError = { error ->
+            println("Error occurred: $error")
+        }
+    )
+}
+
+fun createUser(
+    createUserRequest: CreateUserRequest, onSuccess: (User) -> Unit
+) {
+    val request = generateHttpRequest("POST", "/users", createUserRequest)
+
+    executeRequest<User>(
+        request,
+        onSuccess = { response ->
+            onSuccess(response)
+        },
+        onError = { error ->
+            println("Error occurred: $error")
+        }
+    )
+}
+
+fun registerResult(
+    userOppgaveResult: UserOppgaveResult,
+    onSuccess: (StatsForUser) -> Unit
+) {
+    val request = generateHttpRequest("POST", "/result", userOppgaveResult)
+
+    executeRequest<StatsForUser>(
+        request,
+        onSuccess = { response ->
+            onSuccess(response)
+        },
+        onError = { error ->
+            println("Error occurred: $error")
+        }
+    )
+}
+
+fun getUserStats(
+    userId: Int,
+    onSuccess: (StatsForUser) -> Unit
+) {
+    val request = generateHttpRequest("GET", "/users/$userId/stats")
+
+    executeRequest<StatsForUser>(
+        request,
+        onSuccess = { response ->
+            onSuccess(response)
+        },
+        onError = { error ->
+            println("Error occurred: $error")
         }
     )
 }

@@ -1,6 +1,7 @@
 package no.bekk.kordle
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.ScreenUtils
@@ -8,10 +9,14 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
 import ktx.assets.disposeSafely
+import ktx.assets.toInternalFile
 import ktx.async.KtxAsync
 import ktx.scene2d.*
-import no.bekk.kordle.requests.getTilfeldigOppgave
+import no.bekk.kordle.requests.*
+import no.bekk.kordle.shared.dto.CreateUserRequest
 import no.bekk.kordle.shared.dto.GjettResponse
+import no.bekk.kordle.shared.dto.User
+import no.bekk.kordle.shared.dto.UserOppgaveResult
 import no.bekk.kordle.widgets.GameOver
 import no.bekk.kordle.widgets.GuessRow
 import no.bekk.kordle.widgets.OnScreenKeyboard
@@ -30,6 +35,7 @@ interface KordleUI {
     fun processAddLetter(letter: Char)
     fun processRemoveLetter()
     fun processGjett(gjett: GjettResponse)
+    fun processInvalidGjett(error: String)
     fun processSetActiveRow(rowIndex: Int)
     fun processGameOver(won: Boolean)
 }
@@ -37,6 +43,7 @@ interface KordleUI {
 class FirstScreen : KtxScreen, KordleUI {
     private val batch = SpriteBatch()
     private val stage = Stage(ScreenViewport()).also { Gdx.input.inputProcessor = it }
+    private val kotlinLogo = Texture("kotlinLogo.png".toInternalFile())
 
     private val controller = KordleController(this)
     private var guessRows: MutableList<GuessRow> = mutableListOf()
@@ -49,6 +56,8 @@ class FirstScreen : KtxScreen, KordleUI {
     private val keyboard: OnScreenKeyboard
     private val gameOver: GameOver
 
+    private var user: User? = null
+
     private fun buildGuessRows() {
         guessTable?.clear()
         guessRows = (0 until controller.maxGuesses).map {
@@ -57,6 +66,10 @@ class FirstScreen : KtxScreen, KordleUI {
     }
 
     init {
+        // if you change username, stats effectively reset
+        fetchOrCreateUser("localKordleUser") {
+            user = it
+        }
         getTilfeldigOppgave {
             controller.currentOppgave = it
         }
@@ -65,9 +78,14 @@ class FirstScreen : KtxScreen, KordleUI {
         val rootTable = scene2d.table {
             setFillParent(true)
         }
-        rootTable.label("KORDLE", "large") {
-            color = BekkColors.Natt
-            it.spaceBottom(20f)
+        rootTable.table {
+            image(kotlinLogo) {
+                it.width(28f).height(28f)
+            }
+            label("ORDLE", "large") {
+                color = BekkColors.Natt
+                it.spaceBottom(20f)
+            }
         }
         rootTable.row()
         guessTable = rootTable.table {
@@ -103,8 +121,11 @@ class FirstScreen : KtxScreen, KordleUI {
             }
 
             override fun onEscapePressed() {
-                isPaused = !isPaused
-                gameOver.toggle()
+                if (user != null) {
+                    getUserStats(user!!.id) { stats -> gameOver.setStats(stats) }
+                }
+
+                isPaused = gameOver.toggle()
             }
         }))
         currentGuessRow.setIsActive()
@@ -132,11 +153,27 @@ class FirstScreen : KtxScreen, KordleUI {
         }
     }
 
+    override fun processInvalidGjett(error: String) {
+        currentGuessRow.shake()
+    }
+
     override fun processSetActiveRow(rowIndex: Int) {
         currentGuessRow.setIsActive()
     }
 
     override fun processGameOver(won: Boolean) {
+        if (user != null) {
+            registerResult(
+                UserOppgaveResult(
+                    user!!.id,
+                    controller.currentOppgave!!.id,
+                    won,
+                    controller.currentGuessIndex + 1
+                )
+            ) { stats ->
+                gameOver.setStats(stats)
+            }
+        }
         gameOver.show(won)
     }
 
@@ -152,6 +189,13 @@ class FirstScreen : KtxScreen, KordleUI {
 
     override fun dispose() {
         batch.disposeSafely()
+    }
+}
+
+fun fetchOrCreateUser(username: String, callback: (User) -> Unit) {
+    getUser(username) { user ->
+        if (user != null) callback(user)
+        else createUser(CreateUserRequest(username), callback)
     }
 }
 
