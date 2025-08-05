@@ -162,6 +162,9 @@ class FirstScreen : KtxScreen, KordleUI {
     }
 
     override fun processGameOver(won: Boolean) {
+        val fasitOrd = hentFasitOrd(controller.currentOppgave!!.id)
+        gameOver.setFasitord(fasitOrd)
+
         if (user != null) {
             registerResult(
                 UserOppgaveResult(
@@ -175,6 +178,20 @@ class FirstScreen : KtxScreen, KordleUI {
             }
         }
         gameOver.show(won)
+    }
+
+    private fun hentFasitOrd(oppgaveId: Int): String {
+        var fasitOrd: String = ""
+        getFasitord(
+            oppgaveId = oppgaveId,
+            onSuccess = { response ->
+                fasitOrd = response.fasitOrd
+            },
+            onFailure = { error ->
+                fasitOrd = "Fasitord kunne ikke hentes: $error"
+            }
+        )
+        return fasitOrd
     }
 
     override fun render(delta: Float) {

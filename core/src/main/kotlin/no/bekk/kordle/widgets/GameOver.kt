@@ -14,11 +14,14 @@ import no.bekk.kordle.shared.dto.StatsForUser
 class GameOver(private val parent: Stage, private val controller: KordleController) {
     private val label: Label
     private val stats: Stats
+    private var fasitOrd: String = ""
     private val table: KTableWidget = scene2d.table {
         background = (skin.getDrawable("white") as TextureRegionDrawable).tint(BekkColors.Natt.copy(alpha = 0.9f))
         label = label("Game over", "large") {
             color = BekkColors.Dag
         }
+        row()
+        label("Ordet var '$fasitOrd'", "small")
         row()
         button {
             label("Ny oppgave", "small")
@@ -56,6 +59,7 @@ class GameOver(private val parent: Stage, private val controller: KordleControll
     }
 
     fun show(won: Boolean) {
+        println(this.fasitOrd)
         this.label.setText(
             if (won) {
                 "Du vant!"
@@ -69,6 +73,10 @@ class GameOver(private val parent: Stage, private val controller: KordleControll
 
     fun hide() {
         table.isVisible = false
+    }
+
+    fun setFasitord(fasitOrd: String) {
+        this.fasitOrd = fasitOrd
     }
 }
 
