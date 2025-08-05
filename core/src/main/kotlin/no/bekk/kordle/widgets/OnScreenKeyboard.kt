@@ -55,7 +55,7 @@ class OnScreenKeyboard(private val parent: KTableWidget, private val controller:
         }
         parent.table {
             button {
-                label("autoFail", "small")
+                label("Gi opp", "small")
                 color = BekkColors.Ild1
 
                 onClick {
