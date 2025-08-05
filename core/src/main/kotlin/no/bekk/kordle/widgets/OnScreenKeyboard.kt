@@ -53,6 +53,17 @@ class OnScreenKeyboard(private val parent: KTableWidget, private val controller:
                 }
             }
         }
+        parent.table {
+            button {
+                label("autoFail", "small")
+                color = BekkColors.Ild1
+
+                onClick {
+                    controller.autoFail()
+                }
+                it.width(100f)
+            }
+        }
     }
 
     fun reset() {
