@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter
 inline fun <reified R> executeRequest(
     request: Net.HttpRequest,
     crossinline onSuccess: (R) -> Unit,
-    crossinline onError: (String) -> Unit
+    crossinline onError: (Throwable) -> Unit
 ) {
 
     Gdx.net.sendHttpRequest(request, object : Net.HttpResponseListener {
@@ -30,19 +30,25 @@ inline fun <reified R> executeRequest(
                     }
                     onSuccess(result)
                 } catch (e: Exception) {
-                    onError("Failed to parse response: ${e.message}")
+                    println("Failed to parse response: ${e.message}")
+                    onError(e)
                 }
             } else {
-                onError("HTTP Error: $statusCode - $responseBody")
+                printWithTimeStamp(
+                    "Et ${request.method}-kall til endepunktet '${request.url}' returnerte statuskoden '$statusCode'." +
+                        "Feilmeldingen fra serveren var: '${responseBody}'"
+                )
+                onError(Exception("HTTP request failed with status code $statusCode: $responseBody"))
             }
         }
 
         override fun failed(t: Throwable?) {
-            onError("Request failed: ${t?.message ?: "Unknown error"}")
+            val exception = t ?: Exception("Unknown error occurred")
+            onError(exception)
         }
 
         override fun cancelled() {
-            onError("Request was cancelled")
+            println("Request was cancelled")
         }
     })
 }
@@ -75,7 +81,7 @@ fun generateHttpRequest(
 
 fun getTilfeldigOppgave(
     onSuccess: (OppgaveResponse) -> Unit,
-    onFailure: (String) -> Unit
+    onFailure: (Throwable) -> Unit
 ) {
     val request = generateHttpRequest("GET", "/hentTilfeldigOppgave")
 
@@ -85,7 +91,7 @@ fun getTilfeldigOppgave(
             onSuccess(response)
         },
         onError = { error ->
-            println("[${getCurrentTime()}]: Klarte ikke å hente tilfeldig oppgave grunnet feilen: '$error'")
+            printWithTimeStamp("Klarte ikke å hente tilfeldig oppgave grunnet feilen: '$error'")
             onFailure(error)
         }
     )
@@ -94,7 +100,7 @@ fun getTilfeldigOppgave(
 fun gjettOrd(
     gjettOrdRequest: GjettOrdRequest,
     onSuccess: (GjettResponse) -> Unit,
-    onError: (String) -> Unit
+    onError: (Throwable) -> Unit
 ) {
     val request = generateHttpRequest("POST", "/gjettOrd", gjettOrdRequest)
 
@@ -122,7 +128,7 @@ fun getUser(
             onSuccess(response)
         },
         onError = { error ->
-            println("[${getCurrentTime()}]: Klarte ikke å hente ut bruker grunnet feilen: '$error'")
+            printWithTimeStamp("Klarte ikke å hente ut bruker grunnet feilen: '$error'")
         }
     )
 }
@@ -138,7 +144,7 @@ fun createUser(
             onSuccess(response)
         },
         onError = { error ->
-            println("[${getCurrentTime()}]: Klarte ikke å lage en bruker grunnet feilen: '$error'")
+            printWithTimeStamp("Klarte ikke å lage en bruker grunnet feilen: '$error'")
         }
     )
 }
@@ -180,7 +186,7 @@ fun getUserStats(
 fun getFasitord(
     oppgaveId: Int,
     onSuccess: (HentFasitResponse) -> Unit,
-    onFailure: (String) -> Unit
+    onFailure: (Throwable) -> Unit
 ) {
     val request = generateHttpRequest("POST", "/hentFasit", HentFasitRequest(oppgaveId))
 
@@ -201,4 +207,8 @@ fun getCurrentTime(): String {
         .ofPattern("HH:mm:ss")
         .withZone(ZoneId.of("Europe/Oslo"))
         .format(Instant.now())
+}
+
+fun printWithTimeStamp(message: String) {
+    println("[${getCurrentTime()}]: $message")
 }

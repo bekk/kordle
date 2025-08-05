@@ -37,16 +37,16 @@ class KordleController(private val ui: KordleUI) {
             if (currentGuessIndex < maxGuesses - 1) {
                 currentGuessIndex++
             } else if (!won) {
-                ui.processGameOver(false);
+                ui.processGameOver(false)
             }
 
             value = ""
         }, {
-            ui.processInvalidGjett(it)
+            ui.processInvalidGjett(it.message!!)
         })
     }
 
-    fun autoFail(){
+    fun autoFail() {
         ui.processGameOver(false)
     }
 

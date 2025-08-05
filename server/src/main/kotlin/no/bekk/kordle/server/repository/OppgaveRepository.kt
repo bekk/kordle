@@ -23,7 +23,8 @@ class OppgaveRepository(
         return jdbcTemplate.query(
             // TODO: Legg inn SQL-spørring her
             """
-                """.trimIndent(), // SELECT * FROM OPPGAVE
+                SELECT * FROM OPPGAVE
+                """.trimIndent(),
             DataClassRowMapper(Oppgave::class.java),
         )
     }
