@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class OppgaveResponse(
-    val id: Int,
+    val oppgaveId: Int,
     val lengde: Int,
 )
 
@@ -15,7 +15,7 @@ data class Oppgave(
 ) {
     fun tilOppgaveResponse(): OppgaveResponse {
         return OppgaveResponse(
-            id = this.id,
+            oppgaveId = this.id,
             lengde = this.lengde
         )
     }
@@ -39,6 +39,13 @@ data class GjettResponse(
     val alleBokstavtreff: List<BokstavTreff>
 )
 
+/**
+ * Representerer treff på en bokstav i et ord.
+ * @param plassISekvensen Indikerer posisjonen til bokstaven i ordet. Null-indeksert.
+ * @param bokstavGjettet Bokstaven som ble gjettet.
+ * @param erBokstavenIOrdet Indikerer om bokstaven finnes i ordet.
+ * @param erBokstavenPaaRettsted Indikerer om bokstaven er på riktig sted i ordet.
+ */
 @Serializable
 data class BokstavTreff(
     val plassISekvensen: Int,

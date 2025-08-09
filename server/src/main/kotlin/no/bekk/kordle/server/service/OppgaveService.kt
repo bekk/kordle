@@ -4,7 +4,10 @@ import no.bekk.kordle.server.exceptions.OppgavenEksistererIkkeIDatabasenExceptio
 import no.bekk.kordle.server.exceptions.OrdetEksistererAlleredeIDatabasenException
 import no.bekk.kordle.server.exceptions.OrdetHarUgyldigLengdeException
 import no.bekk.kordle.server.repository.OppgaveRepository
-import no.bekk.kordle.shared.dto.*
+import no.bekk.kordle.shared.dto.BokstavTreff
+import no.bekk.kordle.shared.dto.HentFasitResponse
+import no.bekk.kordle.shared.dto.Oppgave
+import no.bekk.kordle.shared.dto.OppgaveResponse
 import org.springframework.stereotype.Service
 
 @Service
@@ -12,9 +15,14 @@ class OppgaveService(
     val oppgaveRepository: OppgaveRepository
 ) {
 
-    fun hentTilfeldigOppgave(): OppgaveResponse {
+    fun hentTilfeldigOppgave(): Oppgave {
         val alleOppgaver = oppgaveRepository.hentAlleOppgaver()
-        return alleOppgaver.random().tilOppgaveResponse()
+        val tilfeldigOppgave = alleOppgaver.random()
+        return tilfeldigOppgave
+    }
+
+    fun hentAlleOppgaver(): List<OppgaveResponse> {
+        return oppgaveRepository.hentAlleOppgaver().map { it.tilOppgaveResponse() }
     }
 
     // TODO: Vurder om sjekken for eksisterende ord bør gjøres i databasen istedenfor. Kanskje en oppgave i seg selv?
@@ -41,29 +49,24 @@ class OppgaveService(
             lengde = ordSomSkalLeggesTil.length
         )
         return OppgaveResponse(
-            id = idTilNyopprettetOppgave,
+            oppgaveId = idTilNyopprettetOppgave,
             lengde = ordSomSkalLeggesTil.length
         )
     }
 
-    // TODO: Vurder om sjekken for eksisterende ord bør gjøres i databasen istedenfor. Kanskje en oppgave i seg selv?
-    fun gjettOrd(gjettOrdRequest: GjettOrdRequest): GjettResponse {
-        val ordGjett = gjettOrdRequest.ordGjett
-        val oppgaveGjettetPaa = oppgaveRepository.hentOppgave(gjettOrdRequest.oppgaveId)
+    fun gjettOrd(oppgaveId: Int, ordGjettet: String): List<BokstavTreff> {
+        val oppgaveGjettetPaa = oppgaveRepository.hentOppgave(oppgaveId)
         if (oppgaveGjettetPaa == null) {
-            throw OppgavenEksistererIkkeIDatabasenException("Oppgaven med ID ${gjettOrdRequest.oppgaveId} finnes ikke.")
+            throw OppgavenEksistererIkkeIDatabasenException("Oppgaven med ID ${oppgaveId} finnes ikke.")
         }
-        if (ordGjett.length != oppgaveGjettetPaa.ord.length) {
-            throw OrdetHarUgyldigLengdeException("Gjettet '${ordGjett}' er feil lengde for oppgaven. Oppgaven har lengde ${oppgaveGjettetPaa.ord.length} tegn.")
+        if (ordGjettet.length != oppgaveGjettetPaa.ord.length) {
+            throw OrdetHarUgyldigLengdeException("Gjettet '${ordGjettet}' er feil lengde for oppgaven. Oppgaven har lengde ${oppgaveGjettetPaa.ord.length} tegn.")
         }
         val bokstavTreff = sjekkBokstavTreff(
-            oppgave = oppgaveGjettetPaa,
-            ordGjettet = ordGjett
+            ordIOppgave = oppgaveGjettetPaa.ord,
+            ordGjettet = ordGjettet
         )
-        return GjettResponse(
-            oppgaveId = oppgaveGjettetPaa.id,
-            alleBokstavtreff = bokstavTreff
-        )
+        return bokstavTreff
     }
 
     fun hentFasitOrd(oppgaveId: Int): HentFasitResponse {
@@ -77,14 +80,14 @@ class OppgaveService(
     }
 
     private fun sjekkBokstavTreff(
-        oppgave: Oppgave,
+        ordIOppgave: String,
         ordGjettet: String
     ): List<BokstavTreff> {
-        val ordIOppgave: MutableList<Char?> = oppgave.ord.lowercase().map { it }.toMutableList()
+        val ordIOppgaveListe: MutableList<Char?> = ordIOppgave.lowercase().map { it }.toMutableList()
         val treff = ordGjettet.lowercase().mapIndexed { index, bokstav ->
             val hit = ordIOppgave[index] == bokstav
             if (hit) {
-                ordIOppgave[index] = null // Fjerner bokstaven fra ordet for å unngå dobbelttelling
+                ordIOppgaveListe[index] = null // Fjerner bokstaven fra ordet for å unngå dobbelttelling
             }
             BokstavTreff(
                 plassISekvensen = index,
@@ -98,7 +101,7 @@ class OppgaveService(
             val hitIndex = ordIOppgave.indexOfFirst { it == treff.bokstavGjettet }
             if (hitIndex != -1) {
                 treff.erBokstavenIOrdet = true
-                ordIOppgave[hitIndex] = null
+                ordIOppgaveListe[hitIndex] = null
             }
         }
         return treff

@@ -25,7 +25,7 @@ class KordleController(private val ui: KordleUI) {
     fun submit() {
         val oppgave = currentOppgave ?: return
         val gjettOrdRequest = GjettOrdRequest(
-            oppgaveId = oppgave.id,
+            oppgaveId = oppgave.oppgaveId,
             ordGjett = value.uppercase()
         )
         gjettOrd(gjettOrdRequest, { response ->
@@ -37,16 +37,16 @@ class KordleController(private val ui: KordleUI) {
             if (currentGuessIndex < maxGuesses - 1) {
                 currentGuessIndex++
             } else if (!won) {
-                ui.processGameOver(false);
+                ui.processGameOver(false)
             }
 
             value = ""
         }, {
-            ui.processInvalidGjett(it)
+            ui.processInvalidGjett(it.message!!)
         })
     }
 
-    fun autoFail(){
+    fun autoFail() {
         ui.processGameOver(false)
     }
 
