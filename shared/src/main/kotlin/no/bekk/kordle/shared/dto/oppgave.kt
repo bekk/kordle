@@ -39,6 +39,13 @@ data class GjettResponse(
     val alleBokstavtreff: List<BokstavTreff>
 )
 
+/**
+ * Representerer treff på en bokstav i et ord.
+ * @param plassISekvensen Indikerer posisjonen til bokstaven i ordet. Null-indeksert.
+ * @param bokstavGjettet Bokstaven som ble gjettet.
+ * @param erBokstavenIOrdet Indikerer om bokstaven finnes i ordet.
+ * @param erBokstavenPaaRettsted Indikerer om bokstaven er på riktig sted i ordet.
+ */
 @Serializable
 data class BokstavTreff(
     val plassISekvensen: Int,
