@@ -225,3 +225,6 @@ fun gjettOrd(@RequestBody gjettOrdRequest: GjettOrdRequest): GjettResponse {
 ```
 
 </details>
+
+🧪 Når du er ferdig, kan du kjøre opp frontend-applikasjonen og teste om endepunktet fungerer ved å åpne opp
+applikasjonen og se om du kan gjette på ord! 
