@@ -89,7 +89,7 @@ private fun sjekkBokstavTreff(
 
 </details>
 
-## Oppgave 2.2: Gjetting av oppgave
+## Oppgave 2.2: Foretningslogikk og databaseinteraksjon
 
 Nå som vi har en funksjon som kan sjekke treff på bokstaver, er det på tide å lage en funksjon som håndterer
 interaksjonen med databasen.
@@ -139,6 +139,88 @@ fun gjettOrd(oppgaveId: Int, ordGjettet: String): List<BokstavTreff> {
         ordGjettet = ordGjettet
     )
     return bokstavTreff
+}
+```
+
+</details>
+
+## Oppgave 2.3: Endepunkt for gjetting
+
+Nå som vi har en funksjon som kan håndtere gjetting av ord, er det på tide å lage et endepunkt som bruker denne
+funksjonaliteten.
+
+I fila [oppgave.kt](../shared/src/main/kotlin/no/bekk/kordle/shared/dto/oppgave.kt) finner du to klasser:
+
+```kotlin
+@Serializable
+data class GjettOrdRequest(
+    val oppgaveId: Int,
+    val ordGjett: String
+)
+
+
+@Serializable
+data class GjettResponse(
+    val oppgaveId: Int,
+    val alleBokstavtreff: List<BokstavTreff>
+)
+```
+
+Disse to klassene representerer henholdsvis en forespørsel om å gjette et ord og svaret på gjettingen.
+Representasjonene er serialiserbare, noe som betyr at de kan konverteres til JSON og sendes over nettverket.
+I tilfeller sånn som dette, hvor en overfører JSON-objekter i dens `HTTP Message Body`, er det kotyme å bruke opprette
+et POST-endepunkt for å håndtere slike
+forespørsler.([Les mer her](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/POST))
+
+I Spring Boot kan vi enkelt lage et slikt endepunkt ved å bruke annotasjonen `@PostMapping` i en controller-klasse.
+Videre kan vi indikere hvilken objekttype vi forventer å motta i forespørselen sin `HTTP Message Body`  ved å bruke
+annotasjonen `@RequestBody`. Les mer om
+Requestbody [her](https://docs.spring.io/spring-framework/reference/web/webflux/controller/ann-methods/requestbody.html)
+
+Oppgave:
+
+1. Lag en funksjon `gjettOrd` i `OppgaveController.kt` som tar inn en `GjettOrdRequest` og returnerer en
+   `GjettResponse`.
+
+2. Omgjør denne funksjonen til å være et endepunkt med følgende spesifikasjoner:
+    - Endepunktet skal ha URLen `/gjettOrd`.
+    - Endepunktet skal være et HTTP POST-endepunkt.
+    - Endepunktet skal ta imot en `GjettOrdRequest` i `HTTP Message Body`.
+    - Endepunktet skal returnere en `GjettResponse` som inneholder resultatet av gjettingen.
+
+<details>
+<summary> Løsningsforslag </summary>
+
+Oppgave 1:
+
+```kotlin
+ fun gjettOrd(gjettOrdRequest: GjettOrdRequest): GjettResponse {
+    val bokstavTreff = oppgaveService.gjettOrd(
+        oppgaveId = gjettOrdRequest.oppgaveId,
+        ordGjettet = gjettOrdRequest.ordGjett
+    )
+    val gjettResponse = GjettResponse(
+        oppgaveId = gjettOrdRequest.oppgaveId,
+        alleBokstavtreff = bokstavTreff
+    )
+    return gjettResponse
+}
+```
+
+Oppgave 2:
+
+```kotlin
+@PostMapping("/gjettOrd")
+fun gjettOrd(@RequestBody gjettOrdRequest: GjettOrdRequest): GjettResponse {
+    val bokstavTreff = oppgaveService.gjettOrd(
+        oppgaveId = gjettOrdRequest.oppgaveId,
+        ordGjettet = gjettOrdRequest.ordGjett
+    )
+    val gjettResponse = GjettResponse(
+        oppgaveId = gjettOrdRequest.oppgaveId,
+        alleBokstavtreff = bokstavTreff
+    )
+    return gjettResponse
 }
 ```
 

@@ -1,6 +1,8 @@
 package no.bekk.kordle.server.controller
 
-import no.bekk.kordle.server.exceptions.*
+import no.bekk.kordle.server.exceptions.OppgavenEksistererIkkeIDatabasenException
+import no.bekk.kordle.server.exceptions.OrdetEksistererAlleredeIDatabasenException
+import no.bekk.kordle.server.exceptions.OrdetHarUgyldigLengdeException
 import no.bekk.kordle.server.service.OppgaveService
 import no.bekk.kordle.server.service.OrdValidatorService
 import no.bekk.kordle.shared.dto.*
@@ -53,32 +55,45 @@ class OppgaveController(
     }
 
     @PostMapping("/gjettOrd")
-    fun gjettOrd(@RequestBody gjettOrdRequest: GjettOrdRequest): ResponseEntity<*> {
-        try {
-            if (!ordValidatorService.isValid(gjettOrdRequest.ordGjett)) {
-                throw GjettetErIkkeIOrdlistaException("Ordet '${gjettOrdRequest.ordGjett}' er ikke i ordlista.")
-            }
-            val bokstavTreff = oppgaveService.gjettOrd(
-                oppgaveId = gjettOrdRequest.oppgaveId,
-                ordGjettet = gjettOrdRequest.ordGjett
-            )
-            val gjettResponse = GjettResponse(
-                oppgaveId = gjettOrdRequest.oppgaveId,
-                alleBokstavtreff = bokstavTreff
-            )
-            return ResponseEntity.ok().body(gjettResponse)
-
-        } catch (exception: RuntimeException) {
-            val statusKodeSomSkalReturneres = when (exception) {
-                is GjettetHarUgyldigLengdeException -> HttpStatus.BAD_REQUEST
-                is OppgavenEksistererIkkeIDatabasenException -> HttpStatus.BAD_REQUEST
-                else -> HttpStatus.INTERNAL_SERVER_ERROR
-            }
-            return ResponseEntity
-                .status(statusKodeSomSkalReturneres)
-                .body(exception.message)
-        }
+    fun gjettOrd(@RequestBody gjettOrdRequest: GjettOrdRequest): GjettResponse {
+        val bokstavTreff = oppgaveService.gjettOrd(
+            oppgaveId = gjettOrdRequest.oppgaveId,
+            ordGjettet = gjettOrdRequest.ordGjett
+        )
+        val gjettResponse = GjettResponse(
+            oppgaveId = gjettOrdRequest.oppgaveId,
+            alleBokstavtreff = bokstavTreff
+        )
+        return gjettResponse
     }
+
+//    @PostMapping("/gjettOrd")
+//    fun gjettOrd(@RequestBody gjettOrdRequest: GjettOrdRequest): ResponseEntity<*> {
+//        try {
+//            if (!ordValidatorService.isValid(gjettOrdRequest.ordGjett)) {
+//                throw GjettetErIkkeIOrdlistaException("Ordet '${gjettOrdRequest.ordGjett}' er ikke i ordlista.")
+//            }
+//            val bokstavTreff = oppgaveService.gjettOrd(
+//                oppgaveId = gjettOrdRequest.oppgaveId,
+//                ordGjettet = gjettOrdRequest.ordGjett
+//            )
+//            val gjettResponse = GjettResponse(
+//                oppgaveId = gjettOrdRequest.oppgaveId,
+//                alleBokstavtreff = bokstavTreff
+//            )
+//            return ResponseEntity.ok().body(gjettResponse)
+//
+//        } catch (exception: RuntimeException) {
+//            val statusKodeSomSkalReturneres = when (exception) {
+//                is GjettetHarUgyldigLengdeException -> HttpStatus.BAD_REQUEST
+//                is OppgavenEksistererIkkeIDatabasenException -> HttpStatus.BAD_REQUEST
+//                else -> HttpStatus.INTERNAL_SERVER_ERROR
+//            }
+//            return ResponseEntity
+//                .status(statusKodeSomSkalReturneres)
+//                .body(exception.message)
+//        }
+//    }
 
     @PostMapping("/hentFasit")
     fun hentFasit(@RequestBody hentFasitRequest: HentFasitRequest): ResponseEntity<*> {
