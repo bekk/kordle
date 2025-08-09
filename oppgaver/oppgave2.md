@@ -25,4 +25,121 @@ data class GjettResponse(
 )
 ```
 
-Oppgave 2.1: 
+Oppgave 2.1: Sjekk bokstavgjett
+
+I fila [oppgave.kt](../shared/src/main/kotlin/no/bekk/kordle/shared/dto/oppgave.kt) finner du en klasse:
+
+```kotlin
+@Serializable
+data class BokstavTreff(
+    val plassISekvensen: Int,
+    val bokstavGjettet: Char,
+    var erBokstavenIOrdet: Boolean,
+    val erBokstavenPaaRettsted: Boolean
+)
+```
+
+Denne klassen representerer et treff på en bokstav i et ord.
+
+Oppgave:
+
+1. Lag en funksjon `sjekkBokstavTreff` i `OppgaveService.kt` som tar inn to parametere:
+    - ordIOppgave: String - Dette er ordet som er riktig for oppgaven.
+    - ordGjettet: String- Dette er ordet som brukeren har gjettet.
+      Funksjonen skal returnere en liste med `BokstavTreff`-objekter som representerer treffene for hver bokstav i
+      gjetningen.
+
+OBS:
+
+- Husk spillregelen om at en bokstav kan ha flere treff i et ord, men at en skal bare gi tilbakemelding lik antall
+  bokstaver med treff i gjetningen.
+
+<details>
+<summary> Løsningsforslag </summary>
+
+```kotlin
+private fun sjekkBokstavTreff(
+    ordIOppgave: String,
+    ordGjettet: String
+): List<BokstavTreff> {
+    val ordIOppgaveListe: MutableList<Char?> = ordIOppgave.lowercase().map { it }.toMutableList()
+    val treff = ordGjettet.lowercase().mapIndexed { index, bokstav ->
+        val hit = ordIOppgave[index] == bokstav
+        if (hit) {
+            ordIOppgaveListe[index] = null // Fjerner bokstaven fra ordet for å unngå dobbelttelling
+        }
+        BokstavTreff(
+            plassISekvensen = index,
+            bokstavGjettet = bokstav,
+            erBokstavenIOrdet = hit,
+            erBokstavenPaaRettsted = hit
+        )
+    }
+    treff.forEachIndexed { index, treff ->
+        if (treff.erBokstavenPaaRettsted) return@forEachIndexed
+        val hitIndex = ordIOppgave.indexOfFirst { it == treff.bokstavGjettet }
+        if (hitIndex != -1) {
+            treff.erBokstavenIOrdet = true
+            ordIOppgaveListe[hitIndex] = null
+        }
+    }
+    return treff
+}
+```
+
+</details>
+
+## Oppgave 2.2: Gjetting av oppgave
+
+Nå som vi har en funksjon som kan sjekke treff på bokstaver, er det på tide å lage en funksjon som håndterer
+interaksjonen med databasen.
+
+Oppgave:
+
+1. Lag en funksjon `hentOppgave` i `OppgaveRepository.kt` som tar inn en `oppgaveId: Int` og returnerer en instans av
+   `Oppgave`.
+2. Lag en funksjon `gjettOrd` i `OppgaveService.kt` som tar inn to parametre:
+    - oppgaveId: Int - Dette er ID-en til oppgaven som skal gjettes på.
+    - ordGjettet: String - Dette er ordet som brukeren har gjettet
+
+som henter ut oppgaven fra databasen for den angitte `oppgaveId`en.
+
+Deretter skal funksjonen bruke `sjekkBokstavTreff`-funksjonen for å sjekke treffene på bokstavene i gjetningen
+og returnere en liste med `BokstavTreff`-objekter.
+
+<details>
+<summary> Løsningsforslag </summary>
+
+Oppgave 1:
+
+```kotlin
+    fun hentOppgave(oppgaveId: Int): Oppgave {
+    return jdbcTemplate.query(
+        """
+                |SELECT * FROM OPPGAVE
+                |WHERE ID = :id
+            """.trimMargin(),
+        MapSqlParameterSource(
+            mapOf(
+                "id" to oppgaveId,
+            )
+        ),
+        DataClassRowMapper(Oppgave::class.java)
+    ).first()
+}
+```
+
+Oppgave 2:
+
+```kotlin
+fun gjettOrd(oppgaveId: Int, ordGjettet: String): List<BokstavTreff> {
+    val oppgaveGjettetPaa = oppgaveRepository.hentOppgave(oppgaveId)
+    val bokstavTreff = sjekkBokstavTreff(
+        ordIOppgave = oppgaveGjettetPaa.ord,
+        ordGjettet = ordGjettet
+    )
+    return bokstavTreff
+}
+```
+
+</details>

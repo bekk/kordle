@@ -3,10 +3,7 @@ package no.bekk.kordle.server.controller
 import no.bekk.kordle.server.exceptions.*
 import no.bekk.kordle.server.service.OppgaveService
 import no.bekk.kordle.server.service.OrdValidatorService
-import no.bekk.kordle.shared.dto.GjettOrdRequest
-import no.bekk.kordle.shared.dto.HentFasitRequest
-import no.bekk.kordle.shared.dto.LeggTilOrdRequest
-import no.bekk.kordle.shared.dto.OppgaveResponse
+import no.bekk.kordle.shared.dto.*
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -61,8 +58,15 @@ class OppgaveController(
             if (!ordValidatorService.isValid(gjettOrdRequest.ordGjett)) {
                 throw GjettetErIkkeIOrdlistaException("Ordet '${gjettOrdRequest.ordGjett}' er ikke i ordlista.")
             }
-            val bokstavTreff = oppgaveService.gjettOrd(gjettOrdRequest)
-            return ResponseEntity.ok().body(bokstavTreff)
+            val bokstavTreff = oppgaveService.gjettOrd(
+                oppgaveId = gjettOrdRequest.oppgaveId,
+                ordGjettet = gjettOrdRequest.ordGjett
+            )
+            val gjettResponse = GjettResponse(
+                oppgaveId = gjettOrdRequest.oppgaveId,
+                alleBokstavtreff = bokstavTreff
+            )
+            return ResponseEntity.ok().body(gjettResponse)
 
         } catch (exception: RuntimeException) {
             val statusKodeSomSkalReturneres = when (exception) {
