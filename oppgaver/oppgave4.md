@@ -168,7 +168,7 @@ fun createUser(username: String): User {
 I `UserRepository.kt`:
 
 ```kotlin
-    fun createUser(username: String) {
+fun createUser(username: String) {
     val sql = """
             INSERT INTO KordleUser (Username)
             SELECT :username
@@ -183,6 +183,8 @@ I `UserRepository.kt`:
     )
 }
 ```
+
+</details>
 
 <details>
 <summary> Løsningsforslag for Endepunkt 3: `/users/{userId}/stats` (GET) </summary>
@@ -295,6 +297,4 @@ fun create(
     )
 }
 ```
-
-</details>
 

@@ -159,7 +159,7 @@ fun hentOppgave(oppgaveId: Int): Oppgave {
 }
 ```
 
-Oppgave 2:
+Oppgave 3:
 
 ```kotlin
 fun gjettOrd(oppgaveId: Int, ordGjettet: String): List<BokstavTreff> {
