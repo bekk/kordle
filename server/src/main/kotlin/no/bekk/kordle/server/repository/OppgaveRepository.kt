@@ -2,6 +2,7 @@ package no.bekk.kordle.server.repository
 
 import no.bekk.kordle.server.domain.Oppgave
 import org.springframework.jdbc.core.DataClassRowMapper
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Repository
 
@@ -19,10 +20,26 @@ class OppgaveRepository(
     fun hentAlleOppgaver(): List<Oppgave> {
         return jdbcTemplate.query(
             """
-                <LEGG INN SQL SPØRRINGEN HER>
-                """.trimIndent(),
+        SELECT * FROM OPPGAVE
+        """.trimIndent(),
             DataClassRowMapper(Oppgave::class.java),
         )
+    }
+
+    fun hentOppgave(oppgaveId: Int): Oppgave {
+        return jdbcTemplate.query(
+            """
+        SELECT *
+        FROM OPPGAVE
+        WHERE ID = :id
+            """.trimMargin(),
+            MapSqlParameterSource(
+                mapOf(
+                    "id" to oppgaveId,
+                )
+            ),
+            DataClassRowMapper(Oppgave::class.java)
+        ).first()
     }
 }
 
