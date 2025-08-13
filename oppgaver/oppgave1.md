@@ -34,7 +34,7 @@ Deretter trykker du på `Connect`-knappen.
 ## Oppgave 1.1: Hent ut alle oppgaver fra databasen
 
 I denne oppgaven skal vi hente ut alle oppgavene fra databasen ved hjelp av en SQL-spørring. Hvis du vil lese mer om
-sql-spørringer, kan du gjøre dette [her](https://www.w3schools.com/sql/sql)
+sql-spørringer, kan du gjøre dette [her](https://www.w3schools.com/sql/)
 
 Oppgaver:
 
