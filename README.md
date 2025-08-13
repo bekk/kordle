@@ -60,6 +60,13 @@ Nevneverdig funksjonalitet som tilbys av Spring Boot er:
 - Automatisk konfigurasjon av applikasjonen basert på miljøet den kjører i
   og mye mer!
 
+Spring i denne workshoppen kan deles inn i 3 overordnede deler:
+- Controllers, hvor vi definerer API'ene våre.
+- Service, hvor vi vår interne foretningslogikk ligger
+- Repository, som beskriver hvordan vi interagerer med persistente datakilder (les: databaser)
+
+I oppgavene kommer vi til å gå mer i detalj på hvordan disse 3 delene ser ut.
+
 ### H2
 
 [H2](https://www.h2database.com/html/main.html) er en lettvekts database som er skrevet i Java. Den er enkel å bruke og
