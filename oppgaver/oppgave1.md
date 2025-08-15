@@ -7,9 +7,15 @@ Disse ordene kan sees ved å
 
 1. Kjøre opp backend-applikasjonen.
 2. Gå inn på http://localhost:8080/h2-console i nettleseren din. Dette vil åpne opp H2-konsollen.
-3. Logge inn med følgende innstillinger:
+3. Kalkuler JDBC-url du skal bruke med
+
+```bash
+echo "jdbc:h2:tcp://10.242.157.32:9090/./database/mydb" | sed "s/10\.242\.157\.32/$(ifconfig en0 | grep "inet " | awk '{print $2}')/g"
+```
+
+4. Logg inn med følgende innstillinger:
     - Saved Settings: `Generic H2 (Server)`
-    - JDBC URL: `jdbc:h2:tcp://10.242.157.32:9090/./database/mydb`
+    - JDBC URL: <JDBC-url'en kalkulert i trinn 3> (f.eks:`jdbc:h2:tcp://10.242.157.32:9090/./database/mydb`)
     - User Name : `SA` (All caps)
     - Password: `PASSWORD` (All caps)
 
