@@ -7,10 +7,10 @@ Disse ordene kan sees ved å
 
 1. Kjøre opp backend-applikasjonen.
 2. Gå inn på http://localhost:8080/h2-console i nettleseren din. Dette vil åpne opp H2-konsollen.
-3. Kalkuler JDBC-url du skal bruke med
+3. Kalkuler JDBC-url du skal bruke med kommandoen:
 
 ```bash
-echo "jdbc:h2:tcp://10.242.157.32:9090/./database/mydb" | sed "s/10\.242\.157\.32/$(ifconfig en0 | grep "inet " | awk '{print $2}')/g"
+echo "Din JDBC-URL er: $(echo "jdbc:h2:tcp://10.242.157.32:9090/./database/mydb" | sed "s/10\.242\.157\.32/$(ifconfig en0 | grep "inet " | awk '{print $2}')/g")"
 ```
 
 4. Logg inn med følgende innstillinger:
