@@ -6,7 +6,7 @@ Per nå returnerer vi alltid en av to HTTP statuskoder:
 - 500 Internal Server Error hvis noe går galt
 
 Dette er ikke ideelt, da det ikke gir frontenden informasjon om hva som gikk galt.
-Gjettet brukeren et ord som ikke finnes? Eller sendte brukeren inn en ID som ikke eksisterer?
+Gjettet brukeren et ord som ikke finnes?
 La oss forbedre dette ved å bruke flere HTTP statuskoder for å gi mer presis informasjon om hva som skjedde!
 
 [Les mer om HTTP statuskoder her](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status).
@@ -155,6 +155,7 @@ Oppgave 1:
 I oppgaveService på toppen
 
 ```kotlin
+@Service
 class OppgaveService(
     val oppgaveRepository: OppgaveRepository,
     private val ordValidatorService: OrdValidatorService

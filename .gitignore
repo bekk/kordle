@@ -15,6 +15,7 @@ gradle-app.setting
 /server/build/
 /shared/build/
 /database/*
+/server/database/*
 
 ## Java:
 *.class

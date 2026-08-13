@@ -7,9 +7,9 @@ forventer og la deg bestemme selv hvordan du vil implementere det.
 
 ## Hjelpeinformasjon
 
-Du har helt sikkert lagt merke til at databasen inneholder en tabell for brukere (`USERS`) og en for
+Du har helt sikkert lagt merke til at databasen inneholder en tabell for brukere (`KORDLEUSER`) og en for
 oppgave-resultater (`USEROPPGAVERESULT`).
-Tabellen `USERS` inneholder informasjon om brukerne, mens `USEROPPGAVERESULT` lagrer resultatene for hver bruker på hver
+Tabellen `KORDLEUSER` inneholder informasjon om brukerne, mens `USEROPPGAVERESULT` lagrer resultatene for hver bruker på hver
 oppgave.
 
 Videre har en også en fil som inneholder DTO-er for brukere og oppgave-resultater
@@ -58,7 +58,7 @@ curl -X POST -H "Content-Type: application/json" -d '{"username": "tester2"}' ht
 
 ## Endepunkt 3: `/users/{userId}/stats` (GET)
 
-Forventet funksjonalitet: : Henter statistikk for en bruker basert på et brukernavn.
+Forventet funksjonalitet: : Henter statistikk for en bruker basert på brukerens ID.
 
 ### Api-spesifikasjon
 
