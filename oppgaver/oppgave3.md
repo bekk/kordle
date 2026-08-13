@@ -155,6 +155,7 @@ Oppgave 1:
 I oppgaveService på toppen
 
 ```kotlin
+@Service
 class OppgaveService(
     val oppgaveRepository: OppgaveRepository,
     private val ordValidatorService: OrdValidatorService
