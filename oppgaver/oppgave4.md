@@ -58,7 +58,7 @@ curl -X POST -H "Content-Type: application/json" -d '{"username": "tester2"}' ht
 
 ## Endepunkt 3: `/users/{userId}/stats` (GET)
 
-Forventet funksjonalitet: : Henter statistikk for en bruker basert på et brukernavn.
+Forventet funksjonalitet: : Henter statistikk for en bruker basert på brukerens ID.
 
 ### Api-spesifikasjon
 
