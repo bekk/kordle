@@ -43,7 +43,7 @@ Oppgave:
       Funksjonen skal returnere en liste med `BokstavTreff`-objekter hvor bokstaven eksisterer i ordet og er plassert på
       rett posisjon.
 
-3. Fyll ut funksjonen `finnEksakteBokstavTreff`, som er en funksjon som tar inn to parametre:
+3. Fyll ut funksjonen `finnDelvisBokstavTreff`, som er en funksjon som tar inn to parametre:
     - ordIOppgave: String - Dette er ordet som er riktig for oppgaven.
     - ordGjettet: String - Dette er ordet som brukeren har gjettet.
       Funksjonen skal returnere en liste med `BokstavTreff`-objekter hvor bokstaven eksisterer i ordet men er plassert
@@ -52,7 +52,7 @@ Oppgave:
 <details>
 <summary> Løsningsforslag </summary>
 
-Oppgave 1:
+Oppgave 2:
 
 ```kotlin
 fun finnEksakteBokstavTreff(
@@ -79,7 +79,7 @@ fun finnEksakteBokstavTreff(
 }
 ```
 
-Oppgave 2:
+Oppgave 3:
 
 ```kotlin
 fun finnDelvisBokstavTreff(
@@ -192,7 +192,7 @@ data class GjettOrdRequest(
 @Serializable
 data class GjettResponse(
     val oppgaveId: Int,
-    val alleBokstavtreff: List<BokstavTreff>
+    val alleBokstavtreff: List<BokstavTreffDTO>
 )
 ```
 

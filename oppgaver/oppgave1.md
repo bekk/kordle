@@ -25,15 +25,15 @@ Instillingene skal se slik ut:
 
 Deretter trykker du på `Connect`-knappen.
 
-4. Når du er inne i H2-konsollen, vil se en liste over tabeller i databasen. Trykk på pluss-tegnet ved siden av
+5. Når du er inne i H2-konsollen, vil se en liste over tabeller i databasen. Trykk på pluss-tegnet ved siden av
    `Oppgave` for å se de forskjellige kolonnene i tabellen.
 
-5. Her vil en se at `oppgave`-tabellen består av følgende kolonner:
+6. Her vil en se at `oppgave`-tabellen består av følgende kolonner:
     - `id` - ID-en til oppgaven
     - `ord` - Ordet som skal gjettes på
     - `lengde` - Lengden på ordet
 
-6. I midten av skjermen vil du se en `Query Console` der du kan skrive SQL-spørringer for å hente ut data fra databasen.
+7. I midten av skjermen vil du se en `Query Console` der du kan skrive SQL-spørringer for å hente ut data fra databasen.
    Når spørringen er skrevet, kan du trykke på
    `Run`-knappen for å kjøre spørringen. Resultatet av spørringen vil vises i tabellen under `Query Console`.
 
@@ -174,7 +174,7 @@ Oppgaver:
 1. Lag en ny funksjon i `OppgaveController.kt` som henter ut en tilfeldig oppgave og returnerer en instans av typen
    `Oppgave`.
 2. Omgjør denne funksjonen til et GET-endepunkt ved å bruke annotasjonen `@GetMapping`. Endepunktet skal ha URLen
-   `/hentTilfeldigOppgave`"
+   `/hentTilfeldigOppgave`
 
 Når du føler deg klar for å teste endepunktet, kan du kjøre opp backenden (hvis den ikke allerede er oppe) og deretter
 bruke

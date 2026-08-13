@@ -1,5 +1,6 @@
 package no.bekk.kordle.server.utils
 
+//import no.bekk.kordle.server.domain.BokstavTreff
 //
 ///**
 // * Funksjon for å finne hvilke bokstaver som er gjettet som eksisterer i ordet og er på riktig plass
